@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { SearchProvider } from "@/components/search/search-context"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,7 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
-          {children}
+          <SearchProvider>
+            <Suspense>{children}</Suspense>
+          </SearchProvider>
         </ThemeProvider>
       </body>
     </html>

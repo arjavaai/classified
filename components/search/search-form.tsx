@@ -1,51 +1,20 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
+import { useSearch } from "./search-context"
+import { useRouter } from "next/navigation"
 import SearchModal from "./search-modal"
 
 export default function SearchForm() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+  const { filters, dispatch, openModal } = useSearch()
   const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/search-results?q=${encodeURIComponent(searchQuery)}`)
+    if (filters.searchText.trim()) {
+      router.push(`/search-results?q=${encodeURIComponent(filters.searchText)}`)
     }
-  }
-
-  const handleModalSearch = (filters: any) => {
-    // Build query string from filters
-    const params = new URLSearchParams()
-
-    if (filters.searchText) {
-      params.append("q", filters.searchText)
-    }
-
-    if (filters.state) {
-      params.append("state", filters.state)
-    }
-
-    if (filters.city) {
-      params.append("city", filters.city)
-    }
-
-    // Add other filter parameters as needed
-    if (filters.ethnicity && filters.ethnicity.length) {
-      params.append("ethnicity", filters.ethnicity.join(","))
-    }
-
-    if (filters.services && filters.services.length) {
-      params.append("services", filters.services.join(","))
-    }
-
-    // Navigate to search results with filters
-    router.push(`/search-results?${params.toString()}`)
   }
 
   return (
@@ -72,9 +41,9 @@ export default function SearchForm() {
             type="text"
             placeholder="Search By City"
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm text-black"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onClick={() => setIsSearchModalOpen(true)}
+            value={filters.searchText}
+            onChange={(e) => dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value })}
+            onClick={openModal}
           />
         </div>
         <button
@@ -86,11 +55,7 @@ export default function SearchForm() {
         </button>
       </form>
 
-      <SearchModal
-        isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-        onSearch={handleModalSearch}
-      />
+      <SearchModal />
     </>
   )
 }

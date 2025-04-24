@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Calendar, MapPin } from "lucide-react"
-import SearchFilter from "@/components/search-filter"
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
@@ -26,6 +25,13 @@ const sampleListings = [
     state: "CA",
     city: "los-angeles",
     services: ["Girlfriend experience", "Massage", "Outcall"],
+    ethnicity: "Caucasian",
+    nationality: "American",
+    bodyType: "Slender",
+    breastType: "Natural Boobs",
+    hairColor: "Blond Hair",
+    catersTo: ["Men"],
+    placeOfService: ["Incall", "Outcall"],
   },
   {
     id: 2,
@@ -41,6 +47,13 @@ const sampleListings = [
     state: "CA",
     city: "los-angeles",
     services: ["Girlfriend experience", "Dinner dates", "Travel companion", "Events"],
+    ethnicity: "Caucasian",
+    nationality: "American",
+    bodyType: "Athletic",
+    breastType: "Natural Boobs",
+    hairColor: "Brown Hair",
+    catersTo: ["Men", "Couples"],
+    placeOfService: ["Hotel / Motel", "Events and parties"],
   },
   {
     id: 3,
@@ -56,6 +69,13 @@ const sampleListings = [
     state: "CA",
     city: "los-angeles",
     services: ["Massage", "Incall", "Outcall"],
+    ethnicity: "Ebony",
+    nationality: "South African",
+    bodyType: "Athletic",
+    breastType: "Busty",
+    hairColor: "Black Hair",
+    catersTo: ["Men", "Women"],
+    placeOfService: ["Incall", "Outcall"],
   },
   {
     id: 4,
@@ -70,6 +90,13 @@ const sampleListings = [
     state: "CA",
     city: "los-angeles",
     services: ["Role play", "Girlfriend experience", "Incall"],
+    ethnicity: "Asian",
+    nationality: "Japanese",
+    bodyType: "Slender",
+    breastType: "Natural Boobs",
+    hairColor: "Black Hair",
+    catersTo: ["Men"],
+    placeOfService: ["At home", "Incall"],
   },
   {
     id: 5,
@@ -84,6 +111,13 @@ const sampleListings = [
     state: "FL",
     city: "miami",
     services: ["Travel companion", "Events", "Dinner dates"],
+    ethnicity: "Latin",
+    nationality: "Brazilian",
+    bodyType: "Curvy",
+    breastType: "Busty",
+    hairColor: "Brown Hair",
+    catersTo: ["Men", "Couples"],
+    placeOfService: ["Hotel / Motel", "Events and parties"],
   },
   {
     id: 6,
@@ -98,20 +132,38 @@ const sampleListings = [
     state: "NY",
     city: "new-york",
     services: ["Events", "Travel companion", "Girlfriend experience"],
+    ethnicity: "Caucasian",
+    nationality: "Russian",
+    bodyType: "Athletic",
+    breastType: "Natural Boobs",
+    hairColor: "Blond Hair",
+    catersTo: ["Men"],
+    placeOfService: ["Hotel / Motel", "Outcall"],
   },
 ]
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams()
   const query = searchParams.get("q") || ""
+  const state = searchParams.get("state") || ""
+  const city = searchParams.get("city") || ""
+  const ethnicityParam = searchParams.get("ethnicity") || ""
+  const nationalityParam = searchParams.get("nationality") || ""
+  const bodyTypeParam = searchParams.get("bodyType") || ""
+  const breastTypeParam = searchParams.get("breastType") || ""
+  const hairColorParam = searchParams.get("hairColor") || ""
+  const ageRangeParam = searchParams.get("ageRange") || ""
+  const servicesParam = searchParams.get("services") || ""
+  const catersToParam = searchParams.get("catersTo") || ""
+  const placeOfServiceParam = searchParams.get("placeOfService") || ""
 
   const [filteredListings, setFilteredListings] = useState(sampleListings)
-  const [activeFilters, setActiveFilters] = useState<any>({})
 
   useEffect(() => {
-    // Filter listings based on search query
+    // Filter listings based on search parameters
     let results = sampleListings
 
+    // Apply text search filter
     if (query) {
       results = results.filter(
         (listing) =>
@@ -119,57 +171,101 @@ export default function SearchResultsPage() {
           listing.description.toLowerCase().includes(query.toLowerCase()) ||
           listing.location.toLowerCase().includes(query.toLowerCase()),
       )
-    }
-
-    setFilteredListings(results)
-  }, [query])
-
-  const handleApplyFilters = (filters: any) => {
-    setActiveFilters(filters)
-
-    let results = sampleListings
-
-    // Apply search query filter
-    if (query) {
-      results = results.filter(
-        (listing) =>
-          listing.title.toLowerCase().includes(query.toLowerCase()) ||
-          listing.description.toLowerCase().includes(query.toLowerCase()) ||
-          listing.location.toLowerCase().includes(query.toLowerCase()),
-      )
-    }
-
-    // Apply city filter
-    if (filters.city) {
-      results = results.filter((listing) => listing.city === filters.city)
     }
 
     // Apply state filter
-    if (filters.state) {
-      results = results.filter((listing) => listing.state === filters.state)
+    if (state) {
+      results = results.filter((listing) => listing.state === state)
+    }
+
+    // Apply city filter
+    if (city) {
+      results = results.filter((listing) => listing.city === city)
+    }
+
+    // Apply ethnicity filter
+    if (ethnicityParam) {
+      const ethnicities = ethnicityParam.split(",")
+      results = results.filter((listing) => ethnicities.includes(listing.ethnicity))
+    }
+
+    // Apply nationality filter
+    if (nationalityParam) {
+      const nationalities = nationalityParam.split(",")
+      results = results.filter((listing) => nationalities.includes(listing.nationality))
+    }
+
+    // Apply body type filter
+    if (bodyTypeParam) {
+      const bodyTypes = bodyTypeParam.split(",")
+      results = results.filter((listing) => bodyTypes.includes(listing.bodyType))
+    }
+
+    // Apply breast type filter
+    if (breastTypeParam) {
+      const breastTypes = breastTypeParam.split(",")
+      results = results.filter((listing) => breastTypes.includes(listing.breastType))
+    }
+
+    // Apply hair color filter
+    if (hairColorParam) {
+      const hairColors = hairColorParam.split(",")
+      results = results.filter((listing) => hairColors.includes(listing.hairColor))
     }
 
     // Apply age range filter
-    if (filters.ageRange) {
-      results = results.filter((listing) => listing.age >= filters.ageRange[0] && listing.age <= filters.ageRange[1])
-    }
-
-    // Apply price range filter
-    if (filters.priceRange) {
-      results = results.filter(
-        (listing) => listing.price >= filters.priceRange[0] && listing.price <= filters.priceRange[1],
-      )
+    if (ageRangeParam) {
+      const ageRanges = ageRangeParam.split(",")
+      // This is a simplified implementation - in a real app, you'd need to parse the age ranges
+      // and check if the listing's age falls within any of the selected ranges
+      if (ageRanges.includes("18-19")) {
+        results = results.filter((listing) => listing.age >= 18 && listing.age <= 19)
+      } else if (ageRanges.includes("20s")) {
+        results = results.filter((listing) => listing.age >= 20 && listing.age <= 29)
+      } else if (ageRanges.includes("30s")) {
+        results = results.filter((listing) => listing.age >= 30 && listing.age <= 39)
+      } else if (ageRanges.includes("40s")) {
+        results = results.filter((listing) => listing.age >= 40 && listing.age <= 49)
+      } else if (ageRanges.includes("50s")) {
+        results = results.filter((listing) => listing.age >= 50 && listing.age <= 59)
+      } else if (ageRanges.includes("60+")) {
+        results = results.filter((listing) => listing.age >= 60)
+      }
     }
 
     // Apply services filter
-    if (filters.services && filters.services.length > 0) {
-      results = results.filter((listing) =>
-        filters.services.some((service: string) => listing.services.includes(service)),
-      )
+    if (servicesParam) {
+      const services = servicesParam.split(",")
+      results = results.filter((listing) => services.some((service) => listing.services.includes(service)))
+    }
+
+    // Apply caters to filter
+    if (catersToParam) {
+      const catersTo = catersToParam.split(",")
+      results = results.filter((listing) => catersTo.some((caterTo) => listing.catersTo.includes(caterTo)))
+    }
+
+    // Apply place of service filter
+    if (placeOfServiceParam) {
+      const placesOfService = placeOfServiceParam.split(",")
+      results = results.filter((listing) => placesOfService.some((place) => listing.placeOfService.includes(place)))
     }
 
     setFilteredListings(results)
-  }
+  }, [
+    query,
+    state,
+    city,
+    ethnicityParam,
+    nationalityParam,
+    bodyTypeParam,
+    breastTypeParam,
+    hairColorParam,
+    ageRangeParam,
+    servicesParam,
+    catersToParam,
+    placeOfServiceParam,
+  ])
 
   return (
     <div className="bg-gray-100">
@@ -193,9 +289,6 @@ export default function SearchResultsPage() {
         <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
           {query ? `Search Results for "${query}"` : "Los Angeles Escorts"}
         </h1>
-
-        {/* Search Filters */}
-        <SearchFilter onApplyFilters={handleApplyFilters} />
 
         {/* Search Results Date */}
         <div className="text-sm text-gray-600 mb-4 font-medium">

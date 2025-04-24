@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { User, Menu, X, Twitter, Instagram } from "lucide-react"
 // Add the search form component import
-import SearchForm from "@/components/search-form"
+import SearchForm from "@/components/search/search-form"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
