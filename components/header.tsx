@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { User, Menu, X, Twitter, Instagram } from "lucide-react"
+import Image from "next/image"
+import { Menu, X, Twitter, Instagram } from "lucide-react"
 // Add the search form component import
 import SearchForm from "@/components/search/search-form"
 
@@ -17,13 +18,16 @@ export default function Header() {
     <header className="bg-white p-4 rounded-xl shadow-sm mb-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <div className="text-primary mr-2">
-            <User className="h-8 w-8" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-primary">Skluva</h1>
-            <p className="text-xs text-black opacity-75">United States</p>
-          </div>
+          <Link href="/" className="flex items-center">
+            <Image 
+              src="/assets/skluva_logo.png" 
+              alt="Skluva Logo" 
+              width={120} 
+              height={40} 
+              className="h-auto"
+              priority
+            />
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative" id="menuContainer">

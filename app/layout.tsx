@@ -5,13 +5,19 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SearchProvider } from "@/components/search/search-context"
 import { Suspense } from "react"
+import AgeVerificationModal from "@/components/age-verification-modal"
+import CookieConsentModal from "@/components/cookie-consent-modal"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Skluva - Escort Classified Website",
   description: "A modern escort classified directory",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/assets/favicon.png',
+    apple: '/assets/favicon.png',
+  }
 }
 
 export default function RootLayout({
@@ -25,6 +31,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light">
           <SearchProvider>
             <Suspense>{children}</Suspense>
+            <AgeVerificationModal />
+            <CookieConsentModal />
           </SearchProvider>
         </ThemeProvider>
       </body>

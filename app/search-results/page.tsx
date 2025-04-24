@@ -8,9 +8,35 @@ import { Calendar, MapPin } from "lucide-react"
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
+import ImageCarousel from "@/components/listing-card/ImageCarousel"
+import SimpleCarousel from "@/components/listing-card/SimpleCarousel"
+
+// Define the Listing interface
+interface Listing {
+  id: number
+  title: string
+  description: string
+  age: number
+  location: string
+  price: number
+  image: string
+  images?: string[]
+  photoCount: number
+  isTop: boolean
+  state: string
+  city: string
+  services: string[]
+  ethnicity: string
+  nationality: string
+  bodyType: string
+  breastType: string
+  hairColor: string
+  catersTo: string[]
+  placeOfService: string[]
+}
 
 // Sample data for demonstration
-const sampleListings = [
+const sampleListings: Listing[] = [
   {
     id: 1,
     title: "GENUINE Cash in hand payment HIGH PROFILE SERVICE AVAILABLE IN LA",
@@ -20,6 +46,7 @@ const sampleListings = [
     location: "Los Angeles / Beverly Hills",
     price: 150,
     image: "/elegant-gaze.png",
+    images: ["/elegant-gaze.png", "/sophisticated-evening.png", "/confident-professional.png"],
     photoCount: 5,
     isTop: true,
     state: "CA",
@@ -42,6 +69,7 @@ const sampleListings = [
     location: "Los Angeles / Santa Monica",
     price: 250,
     image: "/confident-professional.png",
+    images: ["/confident-professional.png", "/sapphire-serenity.png", "/sophisticated-evening.png"],
     photoCount: 5,
     isTop: true,
     state: "CA",
@@ -64,6 +92,7 @@ const sampleListings = [
     location: "Los Angeles / Hollywood",
     price: 180,
     image: "/confident-african-professional.png",
+    images: ["/confident-african-professional.png", "/sophisticated-evening.png", "/elegant-gaze.png"],
     photoCount: 4,
     isTop: false,
     state: "CA",
@@ -85,6 +114,7 @@ const sampleListings = [
     location: "Beverly Hills",
     price: 200,
     image: "/sapphire-serenity.png",
+    images: ["/sapphire-serenity.png", "/confident-professional.png", "/elegant-gaze.png"],
     photoCount: 3,
     isTop: false,
     state: "CA",
@@ -106,6 +136,7 @@ const sampleListings = [
     location: "Miami / South Beach",
     price: 300,
     image: "/miami-chic.png",
+    images: ["/miami-chic.png", "/sapphire-serenity.png", "/confident-professional.png"],
     photoCount: 6,
     isTop: true,
     state: "FL",
@@ -127,6 +158,7 @@ const sampleListings = [
     location: "New York / Manhattan",
     price: 350,
     image: "/city-chic-portrait.png",
+    images: ["/city-chic-portrait.png", "/elegant-gaze.png", "/confident-professional.png"],
     photoCount: 7,
     isTop: true,
     state: "NY",
@@ -157,7 +189,7 @@ export default function SearchResultsPage() {
   const catersToParam = searchParams.get("catersTo") || ""
   const placeOfServiceParam = searchParams.get("placeOfService") || ""
 
-  const [filteredListings, setFilteredListings] = useState(sampleListings)
+  const [filteredListings, setFilteredListings] = useState<Listing[]>(sampleListings)
 
   useEffect(() => {
     // Filter listings based on search parameters
@@ -303,51 +335,30 @@ export default function SearchResultsPage() {
         {/* Search Results Listings */}
         {filteredListings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8">
-            {filteredListings.map((listing) => (
+            {filteredListings.map((listing, index) => (
               <Link href={`/listing/${listing.id}`} key={listing.id} className="block no-underline text-black">
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden flex hover:shadow-md transition-shadow">
-                  <div className="w-[120px] min-w-[120px] h-[140px] relative">
-                    <Image
-                      src={listing.image || "/placeholder.svg"}
-                      alt="Escort"
-                      width={634}
-                      height={634}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 px-1.5 py-0.5 rounded text-xs font-medium">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="inline-block w-3 h-3 mr-1 text-primary"
-                      >
-                        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-                        <circle cx="12" cy="13" r="3" />
-                      </svg>{" "}
-                      {listing.photoCount}
-                    </div>
-                  </div>
-                  <div className="p-3 flex-1">
-                    <div className="text-accent-blue font-bold text-base mb-1">{listing.title}</div>
-                    <p className="text-gray-700 text-xs mb-2">{listing.description}</p>
-                    <div className="flex items-center text-xs text-gray-600 mb-1">
-                      <Calendar className="mr-2 text-gray-400 h-3 w-3" />
+                  <ImageCarousel 
+                    images={listing.images || [listing.image]} 
+                    photoCount={listing.photoCount}
+                  />
+                  <div className="p-4 flex-1">
+                    <div className="text-accent-blue font-bold text-base mb-2">{listing.title}</div>
+                    <p className="text-gray-700 text-sm mb-3 line-clamp-2">{listing.description}</p>
+                    <div className="flex items-center text-sm text-gray-600 mb-2">
+                      <Calendar className="mr-2 text-gray-400 h-4 w-4" />
                       <span>{listing.age} years</span>
                     </div>
-                    <div className="flex items-center text-xs text-gray-600">
-                      <MapPin className="mr-2 text-gray-400 h-3 w-3" />
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="mr-2 text-gray-400 h-4 w-4" />
                       <span>{listing.location}</span>
                       {listing.isTop && (
-                        <span className="ml-2 bg-green-50 text-green-600 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                        <span className="ml-2 bg-green-50 text-green-600 px-1.5 py-0.5 rounded text-[11px] font-semibold">
                           Top
                         </span>
                       )}
                     </div>
-                    <div className="text-green-600 font-semibold text-sm mt-1">${listing.price}</div>
+                    <div className="text-green-600 font-semibold text-lg mt-2">${listing.price}</div>
                   </div>
                 </div>
               </Link>
