@@ -7,18 +7,20 @@ interface StepsProgressProps {
 export default function StepsProgress({ currentStep }: StepsProgressProps) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <div className="flex justify-between items-center max-w-md mx-auto relative">
-        {/* Line connecting the steps */}
-        <div className="absolute h-[2px] bg-gray-200 top-1/2 left-[15%] right-[15%] -translate-y-1/2 z-0"></div>
+      <div className="flex justify-between items-center max-w-3xl mx-auto relative">
 
-        {/* Step 1 */}
-        <StepIndicator step={1} currentStep={currentStep} label="Add information" />
+        {/* Step indicators with equal width containers */}
+        <div className="flex-1 flex justify-center">
+          <StepIndicator step={1} currentStep={currentStep} label="Add information" />
+        </div>
 
-        {/* Step 2 */}
-        <StepIndicator step={2} currentStep={currentStep} label="Photos" />
+        <div className="flex-1 flex justify-center">
+          <StepIndicator step={2} currentStep={currentStep} label="Photos" />
+        </div>
 
-        {/* Step 3 */}
-        <StepIndicator step={3} currentStep={currentStep} label="Finish" />
+        <div className="flex-1 flex justify-center">
+          <StepIndicator step={3} currentStep={currentStep} label="Finish" />
+        </div>
       </div>
     </div>
   )

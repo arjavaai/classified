@@ -47,27 +47,51 @@ export default function Header() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/create-ad"
-                className="bg-primary text-white text-center px-4 py-2 rounded-md font-semibold hover:bg-primary/90 transition"
+                className="btn btn-primary"
               >
                 Create AD
               </Link>
               
               {user ? (
-                <Link 
-                  href="/profile" 
-                  className="flex items-center gap-2 hover:text-primary font-semibold"
-                >
-                  <div className="bg-gray-100 p-2 rounded-full">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="hidden sm:inline">Profile</span>
-                </Link>
+                <>
+                  <Link 
+                    href="/dashboard?tab=overview" 
+                    className="flex items-center gap-2 hover:text-primary font-semibold"
+                  >
+                    <div className="bg-gray-100 p-2 rounded-full">
+                      <svg
+                        className="h-5 w-5 text-primary"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect width="7" height="7" x="3" y="3" rx="1" />
+                        <rect width="7" height="7" x="14" y="3" rx="1" />
+                        <rect width="7" height="7" x="14" y="14" rx="1" />
+                        <rect width="7" height="7" x="3" y="14" rx="1" />
+                      </svg>
+                    </div>
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Link>
+                  <Link 
+                    href="/profile" 
+                    className="flex items-center gap-2 hover:text-primary font-semibold"
+                  >
+                    <div className="bg-gray-100 p-2 rounded-full">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="hidden sm:inline">Profile</span>
+                  </Link>
+                </>
               ) : (
                 <>
-                  <Link href="/login" className="text-gray-700 hover:text-primary font-semibold">
+                  <Link href="/login" className="btn btn-secondary btn-sm">
                     Login
                   </Link>
-                  <Link href="/signup" className="text-gray-700 hover:text-primary font-semibold">
+                  <Link href="/signup" className="btn btn-primary btn-sm">
                     Signup
                   </Link>
                 </>
@@ -93,7 +117,7 @@ export default function Header() {
                   {/* Post Your Ad Button */}
                   <a
                     href="/create-ad"
-                    className="block w-full bg-primary text-white text-center font-bold py-4 px-4 mb-6 rounded-md hover:bg-primary/90 transition text-lg"
+                    className="block w-full btn btn-primary btn-lg mb-6 text-center"
                   >
                     Create AD
                   </a>
@@ -103,6 +127,8 @@ export default function Header() {
                     <div className="bg-gray-100 p-6 mb-6 rounded-md">
                       <div className="flex flex-col items-center mb-4">
                         <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-3">
+                          
+
                           <img
                             src="/diverse-professional-profiles.png"
                             alt="Profile"
@@ -119,7 +145,7 @@ export default function Header() {
                       </div>
 
                       {/* User Menu Options */}
-                      <Link href="/profile" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
+                      <Link href="/dashboard?tab=overview" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
                         <div className="text-primary mr-3 text-lg">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -139,6 +165,26 @@ export default function Header() {
                           </svg>
                         </div>
                         <span className="text-lg">Dashboard</span>
+                      </Link>
+                      <Link href="/dashboard?tab=posts" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
+                        <div className="text-primary mr-3 text-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                          </svg>
+                        </div>
+                        <span className="text-lg">My Posts</span>
                       </Link>
                       <Link href="/profile" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
                         <div className="text-primary mr-3 text-lg">
@@ -193,13 +239,13 @@ export default function Header() {
                     <div className="mb-6">
                       <Link
                         href="/login"
-                        className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 mb-3 rounded-md hover:bg-gray-300 transition text-lg"
+                        className="block w-full btn btn-secondary mb-3 text-center"
                       >
                         Login
                       </Link>
                       <Link
                         href="/signup"
-                        className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition text-lg"
+                        className="block w-full btn btn-primary text-center"
                       >
                         Signup
                       </Link>

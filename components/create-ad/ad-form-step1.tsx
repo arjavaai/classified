@@ -614,7 +614,7 @@ function RatesTable({ rates, onChange }: RatesTableProps) {
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:border-primary focus:outline-none"
               />
             </div>
-            <div className="text-gray-600 text-center">EUR</div>
+            <div className="text-gray-600 text-center">$</div>
           </div>
         ))}
       </div>

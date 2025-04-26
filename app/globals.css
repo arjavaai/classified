@@ -7,6 +7,26 @@
   --primary-light: #4da3ff;
   --accent-blue: #007bfd;
   --accent-pink: #dd3675;
+  --radius: 0.75rem;
+}
+
+/* Modern Button Styles */
+@layer components {
+  .btn {
+    @apply rounded-full px-6 py-2.5 font-medium transition-all duration-200 shadow-sm;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-light hover:shadow-md;
+  }
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 hover:shadow-md;
+  }
+  .btn-sm {
+    @apply px-4 py-1.5 text-sm;
+  }
+  .btn-lg {
+    @apply px-8 py-3 text-lg;
+  }
 }
 
 body {
