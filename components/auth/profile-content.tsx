@@ -5,25 +5,23 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/context/auth-context"
 import { toast } from "sonner"
+import Link from "next/link"
+import { LayoutDashboard } from "lucide-react"
 
 export default function ProfileContent() {
-  const { user, logout } = useAuth()
+  const { user, signOut } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleLogout = async () => {
     setIsLoading(true)
     try {
-      const result = await logout()
-      
-      if (result.success) {
-        toast.success("Logged out successfully")
-        router.push("/")
-      } else {
-        toast.error(result.error || "Failed to log out")
-      }
+      await signOut();
+      toast.success("Logged out successfully")
+      // The router navigation is handled by the auth context
     } catch (error) {
-      toast.error("An unexpected error occurred")
+      console.error("Error during logout:", error);
+      toast.error("Failed to log out")
     } finally {
       setIsLoading(false)
     }
@@ -112,6 +110,15 @@ export default function ProfileContent() {
         </div>
 
         <div className="space-y-3">
+          <Link href="/dashboard" className="w-full block">
+            <Button 
+              className="w-full bg-primary text-white hover:bg-primary/90 flex items-center gap-2"
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              <span>Dashboard</span>
+            </Button>
+          </Link>
+          
           <Button
             onClick={handleLogout}
             disabled={isLoading}

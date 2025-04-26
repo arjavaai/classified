@@ -1,7 +1,7 @@
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
-import VerifyEmailContent from "@/components/auth/verify-email-content"
+import { VerifyEmailContent } from "@/components/auth/verify-email-content"
 
 export default function VerifyEmailPage() {
   return (

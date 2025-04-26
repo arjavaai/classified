@@ -36,12 +36,13 @@ if (!hasValidConfig) {
   // Fall back to hardcoded values for development only
   if (process.env.NODE_ENV === 'development') {
     console.log("Falling back to hardcoded values in development mode");
-    firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyDp20G5dihP-qT5RKwm6069eBectMLT67k";
-    firebaseConfig.authDomain = firebaseConfig.authDomain || "classified-5951c.firebaseapp.com";
-    firebaseConfig.projectId = firebaseConfig.projectId || "classified-5951c";
-    firebaseConfig.storageBucket = firebaseConfig.storageBucket || "classified-5951c.firebasestorage.app";
-    firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "778890110423";
-    firebaseConfig.appId = firebaseConfig.appId || "1:778890110423:web:c226a31df27db70a7bd792";
+    // Update with the correct fallback values matching the current project
+    firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyBkhEAy18wAhpxkUJwv0XoGTfUbOdq_y3Y";
+    firebaseConfig.authDomain = firebaseConfig.authDomain || "skluva.firebaseapp.com";
+    firebaseConfig.projectId = firebaseConfig.projectId || "skluva";
+    firebaseConfig.storageBucket = firebaseConfig.storageBucket || "skluva.firebasestorage.app";
+    firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "567077871212";
+    firebaseConfig.appId = firebaseConfig.appId || "1:567077871212:web:65517af125e7ce809f8249";
     console.log("Using fallback values:", { 
       ...firebaseConfig, 
       apiKey: "HIDDEN" 

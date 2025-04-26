@@ -3,15 +3,27 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, Twitter, Instagram } from "lucide-react"
+import { Menu, X, Twitter, Instagram, User } from "lucide-react"
 // Add the search form component import
 import SearchForm from "@/components/search/search-form"
+import { useAuth } from "@/lib/context/auth-context"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, signOut } = useAuth()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      console.log("Logged out successfully");
+      toggleMenu();
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   }
 
   return (
@@ -39,12 +51,27 @@ export default function Header() {
               >
                 Create AD
               </Link>
-              <Link href="/login" className="text-gray-700 hover:text-primary font-semibold">
-                Login
-              </Link>
-              <Link href="/signup" className="text-gray-700 hover:text-primary font-semibold">
-                Signup
-              </Link>
+              
+              {user ? (
+                <Link 
+                  href="/profile" 
+                  className="flex items-center gap-2 hover:text-primary font-semibold"
+                >
+                  <div className="bg-gray-100 p-2 rounded-full">
+                    <User className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="hidden sm:inline">Profile</span>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" className="text-gray-700 hover:text-primary font-semibold">
+                    Login
+                  </Link>
+                  <Link href="/signup" className="text-gray-700 hover:text-primary font-semibold">
+                    Signup
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Toggle (visible on mobile) */}
@@ -71,104 +98,113 @@ export default function Header() {
                     Create AD
                   </a>
 
-                  {/* User Profile Section */}
-                  <div className="bg-gray-100 p-6 mb-6 rounded-md">
-                    <div className="flex flex-col items-center mb-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-3">
-                        <img
-                          src="/diverse-professional-profiles.png"
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
+                  {user ? (
+                    /* User Profile Section - Show when logged in */
+                    <div className="bg-gray-100 p-6 mb-6 rounded-md">
+                      <div className="flex flex-col items-center mb-4">
+                        <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-3">
+                          <img
+                            src="/diverse-professional-profiles.png"
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="font-bold text-xl">{user.email ? user.email.split('@')[0] : 'User'}</p>
+                          {/* Safely check for customerId in user metadata */}
+                          {user && (user as any).customerId && (
+                            <p className="text-sm text-gray-500">ID: {(user as any).customerId}</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="font-bold text-xl">Jr</p>
-                      </div>
+
+                      {/* User Menu Options */}
+                      <Link href="/profile" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
+                        <div className="text-primary mr-3 text-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect width="7" height="7" x="3" y="3" rx="1" />
+                            <rect width="7" height="7" x="14" y="3" rx="1" />
+                            <rect width="7" height="7" x="14" y="14" rx="1" />
+                            <rect width="7" height="7" x="3" y="14" rx="1" />
+                          </svg>
+                        </div>
+                        <span className="text-lg">Dashboard</span>
+                      </Link>
+                      <Link href="/profile" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
+                        <div className="text-primary mr-3 text-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M19 7.5v3a1.5 1.5 0 0 1-1.5 1.5H16" />
+                            <path d="M12 2v8" />
+                            <path d="M7.5 7H5a1.5 1.5 0 0 0-1.5 1.5v3" />
+                            <path d="M16 16.5V18a1.5 1.5 0 0 1-1.5 1.5H12" />
+                            <path d="M12 22v-8" />
+                            <path d="M7.5 17H5A1.5 1.5 0 0 1 3.5 15.5V14" />
+                            <circle cx="12" cy="12" r="1" />
+                          </svg>
+                        </div>
+                        <span className="text-lg">Profile Setting</span>
+                      </Link>
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full flex items-center p-3 rounded hover:bg-gray-200 transition"
+                      >
+                        <div className="text-primary mr-3 text-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                          </svg>
+                        </div>
+                        <span className="text-lg">Logout</span>
+                      </button>
                     </div>
-
-                    {/* User Menu Options */}
-                    <Link href="#" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
-                      <div className="text-primary mr-3 text-lg">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <rect width="7" height="7" x="3" y="3" rx="1" />
-                          <rect width="7" height="7" x="14" y="3" rx="1" />
-                          <rect width="7" height="7" x="14" y="14" rx="1" />
-                          <rect width="7" height="7" x="3" y="14" rx="1" />
-                        </svg>
-                      </div>
-                      <span className="text-lg">Dashboard</span>
-                    </Link>
-                    <Link href="#" className="flex items-center p-3 mb-3 rounded hover:bg-gray-200 transition">
-                      <div className="text-primary mr-3 text-lg">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M19 7.5v3a1.5 1.5 0 0 1-1.5 1.5H16" />
-                          <path d="M12 2v8" />
-                          <path d="M7.5 7H5a1.5 1.5 0 0 0-1.5 1.5v3" />
-                          <path d="M16 16.5V18a1.5 1.5 0 0 1-1.5 1.5H12" />
-                          <path d="M12 22v-8" />
-                          <path d="M7.5 17H5A1.5 1.5 0 0 1 3.5 15.5V14" />
-                          <circle cx="12" cy="12" r="1" />
-                        </svg>
-                      </div>
-                      <span className="text-lg">Profile Setting</span>
-                    </Link>
-                    <Link href="#" className="flex items-center p-3 rounded hover:bg-gray-200 transition">
-                      <div className="text-primary mr-3 text-lg">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                          <polyline points="16 17 21 12 16 7" />
-                          <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                      </div>
-                      <span className="text-lg">Logout</span>
-                    </Link>
-                  </div>
-
-                  {/* Login/Signup Section */}
-                  <div className="mb-6">
-                    <Link
-                      href="/login"
-                      className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 mb-3 rounded-md hover:bg-gray-300 transition text-lg"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition text-lg"
-                    >
-                      Signup
-                    </Link>
-                  </div>
+                  ) : (
+                    /* Login/Signup Section - Show when not logged in */
+                    <div className="mb-6">
+                      <Link
+                        href="/login"
+                        className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 mb-3 rounded-md hover:bg-gray-300 transition text-lg"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href="/signup"
+                        className="block w-full bg-gray-200 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition text-lg"
+                      >
+                        Signup
+                      </Link>
+                    </div>
+                  )}
 
                   {/* Social Media Section */}
                   <div className="pb-8">
