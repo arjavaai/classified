@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 
 // Firebase configuration with fallback to hardcoded values
@@ -63,7 +64,47 @@ try {
 }
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 console.log("Firebase Auth initialized", auth ? "successfully" : "failed");
+console.log("Firebase Firestore initialized", db ? "successfully" : "failed");
+
+// Generate a unique customer ID (8 characters alphanumeric)
+const generateUniqueCustomerId = async (): Promise<string> => {
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking characters like 0, O, 1, I
+  let customerId: string = '';
+  let isUnique = false;
+  
+  // Keep generating until we find a unique ID
+  while (!isUnique) {
+    customerId = '';
+    // Generate 8 character ID
+    for (let i = 0; i < 8; i++) {
+      customerId += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    console.log(`Generated customer ID candidate: ${customerId}`);
+    
+    // Check if this ID already exists in the database
+    try {
+      const customerQuery = query(collection(db, "users"), where("customerId", "==", customerId));
+      const querySnapshot = await getDocs(customerQuery);
+      
+      if (querySnapshot.empty) {
+        // No matching document found, so this ID is unique
+        isUnique = true;
+        console.log(`Customer ID ${customerId} is unique and will be used`);
+      } else {
+        console.log(`Customer ID ${customerId} already exists, generating a new one`);
+      }
+    } catch (error) {
+      console.error("Error checking customer ID uniqueness:", error);
+      // In case of error, we'll just assume the ID is unique to avoid infinite loops
+      isUnique = true;
+    }
+  }
+  
+  return customerId;
+};
 
 // Authentication functions
 export const signUp = async (email: string, password: string) => {
@@ -71,10 +112,30 @@ export const signUp = async (email: string, password: string) => {
   try {
     console.log("Calling createUserWithEmailAndPassword");
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("User created successfully, sending verification email");
+    
+    // Generate a unique customer ID
+    const customerId = await generateUniqueCustomerId();
+    
+    // Create a user profile in Firestore
+    const userDocRef = doc(db, "users", userCredential.user.uid);
+    await setDoc(userDocRef, {
+      email: email,
+      customerId: customerId,
+      createdAt: new Date(),
+      emailVerified: userCredential.user.emailVerified || false,
+    });
+    
+    console.log(`User created successfully with customer ID: ${customerId}, sending verification email`);
+    
+    // Send verification email
     await sendEmailVerification(userCredential.user);
     console.log("Verification email sent");
-    return { success: true, user: userCredential.user };
+    
+    return { 
+      success: true, 
+      user: userCredential.user,
+      customerId: customerId
+    };
   } catch (error: any) {
     console.error("Error in signUp:", error.code, error.message);
     return { success: false, error: error.message };
@@ -119,4 +180,4 @@ export const logOut = async () => {
 
 // Export for debugging
 console.log("Firebase module loaded and exporting auth");
-export { auth }; 
+export { auth, db }; 

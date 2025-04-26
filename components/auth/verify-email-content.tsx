@@ -12,9 +12,18 @@ export function VerifyEmailContent() {
   const [isLoading, setIsLoading] = useState(false)
   const [isVerified, setIsVerified] = useState(false)
   const [isCheckingVerification, setIsCheckingVerification] = useState(true)
+  const [customerId, setCustomerId] = useState<string | null>(null)
   const { user, refreshUser } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+
+  // Load customer ID from localStorage if available
+  useEffect(() => {
+    const storedCustomerId = localStorage.getItem("lastCustomerId")
+    if (storedCustomerId) {
+      setCustomerId(storedCustomerId)
+    }
+  }, [])
 
   // Check verification status when component loads
   useEffect(() => {
@@ -138,6 +147,18 @@ export function VerifyEmailContent() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4 text-center">
       <h1 className="text-2xl font-bold">Verify Your Email</h1>
+      
+      {customerId && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="font-medium text-blue-800">
+            Your Customer ID: <span className="font-bold">{customerId}</span>
+          </p>
+          <p className="text-sm text-blue-600 mt-1">
+            Please save this ID for future reference. You'll need it for customer support.
+          </p>
+        </div>
+      )}
+      
       <p>
         We've sent a verification email to <span className="font-medium">{user?.email}</span>.
         Please check your inbox and click the link to verify your email address.

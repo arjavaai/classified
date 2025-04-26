@@ -17,6 +17,7 @@ export default function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [customerId, setCustomerId] = useState<string | null>(null)
   const [passwordValidation, setPasswordValidation] = useState({
     hasUpperLower: false,
     hasNumber: false,
@@ -68,9 +69,21 @@ export default function SignupForm() {
       console.log("Signup result:", result)
       
       if (result.success) {
-        toast.success("Account created successfully! Please verify your email.")
-        // Redirect to verification page
-        router.push("/verify-email")
+        // Store the customer ID
+        if (result.customerId) {
+          setCustomerId(result.customerId)
+          // Store in localStorage for future reference
+          localStorage.setItem("lastCustomerId", result.customerId)
+        }
+        
+        toast.success(`Account created successfully! Your Customer ID is: ${result.customerId}`)
+        // Show success message with customer ID
+        toast.success("Please verify your email to continue.")
+        
+        // Redirect to verification page after a short delay to allow user to see the customer ID
+        setTimeout(() => {
+          router.push("/verify-email")
+        }, 5000)
       } else {
         console.error("Signup error:", result.error)
         toast.error(result.error || "Failed to create account")
