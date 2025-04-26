@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Filter, X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { Input } from "@/components/ui/input"
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 export default function SearchFilter({ onApplyFilters }: { onApplyFilters: (filters: any) => void }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -27,6 +28,23 @@ export default function SearchFilter({ onApplyFilters }: { onApplyFilters: (filt
   const [selectedCatersTo, setSelectedCatersTo] = useState<string[]>([])
   const [selectedPlaceOfService, setSelectedPlaceOfService] = useState<string[]>([])
   const [searchText, setSearchText] = useState("")
+  const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
+  const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([])
+
+  // Load states when component mounts
+  useEffect(() => {
+    setStatesList(getStates())
+  }, [])
+
+  // Load cities when state changes
+  useEffect(() => {
+    if (selectedState) {
+      setCitiesList(getCitiesByStateCode(selectedState))
+      setSelectedCity("") // Reset city when state changes
+    } else {
+      setCitiesList([])
+    }
+  }, [selectedState])
 
   const services = [
     "Oral",
@@ -157,32 +175,31 @@ export default function SearchFilter({ onApplyFilters }: { onApplyFilters: (filt
                         <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="AL">Alabama</SelectItem>
-                        <SelectItem value="AK">Alaska</SelectItem>
-                        <SelectItem value="AZ">Arizona</SelectItem>
-                        <SelectItem value="CA">California</SelectItem>
-                        <SelectItem value="CO">Colorado</SelectItem>
-                        <SelectItem value="FL">Florida</SelectItem>
-                        <SelectItem value="NY">New York</SelectItem>
-                        <SelectItem value="TX">Texas</SelectItem>
+                        {statesList.map((state) => (
+                          <SelectItem key={state.abbreviation} value={state.abbreviation}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
                     <Label htmlFor="city">City</Label>
-                    <Select value={selectedCity} onValueChange={setSelectedCity}>
+                    <Select 
+                      value={selectedCity} 
+                      onValueChange={setSelectedCity}
+                      disabled={!selectedState}
+                    >
                       <SelectTrigger id="city">
-                        <SelectValue placeholder="Select city" />
+                        <SelectValue placeholder={selectedState ? "Select city" : "Select state first"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="los-angeles">Los Angeles</SelectItem>
-                        <SelectItem value="san-francisco">San Francisco</SelectItem>
-                        <SelectItem value="san-diego">San Diego</SelectItem>
-                        <SelectItem value="new-york">New York</SelectItem>
-                        <SelectItem value="miami">Miami</SelectItem>
-                        <SelectItem value="chicago">Chicago</SelectItem>
-                        <SelectItem value="houston">Houston</SelectItem>
+                        {citiesList.map((city) => (
+                          <SelectItem key={city.slug} value={city.slug}>
+                            {city.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

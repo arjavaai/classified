@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -14,18 +14,101 @@ import {
   List,
   Tags,
   Clock,
-  Phone,
   MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react"
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
+import { WhatsAppIcon, EmailIcon, PhoneIcon } from "@/lib/icons"
+import { contactInfo } from "@/lib/config"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation, Pagination, Autoplay, FreeMode } from "swiper/modules"
+
+// Import Swiper styles
+import "swiper/css"
+import "swiper/css/navigation"
+import "swiper/css/pagination"
+import "swiper/css/free-mode"
+import "./styles.css"
 
 export default function ListingDetailPage() {
   const [showMobileButtons, setShowMobileButtons] = useState(true);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [fullscreenActive, setFullscreenActive] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
+  
+  // Image gallery
+  const galleryImages = [
+    {
+      src: "/sophisticated-evening.png",
+      alt: "Elite Companion",
+      width: 180
+    },
+    {
+      src: "/confident-professional.png",
+      alt: "Elite Companion",
+      width: 250
+    },
+    {
+      src: "/sapphire-serenity.png",
+      alt: "Elite Companion",
+      width: 150
+    },
+    {
+      src: "/elegant-gaze.png",
+      alt: "Elite Companion",
+      width: 180
+    },
+    {
+      src: "/confident-african-professional.png",
+      alt: "Elite Companion",
+      width: 250
+    }
+  ];
 
+  const handleOpenFullscreen = (index: number): void => {
+    setFullscreenIndex(index);
+    setFullscreenActive(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseFullscreen = (): void => {
+    setFullscreenActive(false);
+    document.body.style.overflow = '';
+  };
+
+  const handlePrevImage = (): void => {
+    setFullscreenIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
+  const handleNextImage = (): void => {
+    setFullscreenIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  // Handle keyboard navigation
   useEffect(() => {
-    const handleScroll = () => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (!fullscreenActive) return;
+      
+      if (e.key === 'Escape') {
+        handleCloseFullscreen();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [fullscreenActive]);
+
+  // Mobile scrolling effect for buttons
+  useEffect(() => {
+    const handleScroll = (): void => {
       const footer = document.getElementById('page-footer');
       const contactInfo = document.getElementById('contact-info-section');
       
@@ -43,6 +126,29 @@ export default function ListingDetailPage() {
     handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Touch handling for fullscreen swipe
+  const touchStartRef = useRef(0);
+  
+  const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>): void => {
+    touchStartRef.current = e.touches[0].clientX;
+  };
+  
+  const handleTouchEnd = (e: React.TouchEvent<HTMLImageElement>): void => {
+    const touchEnd = e.changedTouches[0].clientX;
+    const difference = touchStartRef.current - touchEnd;
+    
+    // Swipe threshold
+    if (Math.abs(difference) > 50) {
+      if (difference > 0) {
+        // Swipe left - next image
+        handleNextImage();
+      } else {
+        // Swipe right - previous image
+        handlePrevImage();
+      }
+    }
+  };
 
   return (
     <div className="bg-gray-100">
@@ -64,12 +170,6 @@ export default function ListingDetailPage() {
           </Link>
           <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
           <span className="text-accent-blue font-medium">Elite Companion Services</span>
-        </div>
-
-        {/* Mobile Companion Info - Only visible on mobile */}
-        <div className="md:hidden bg-white p-4 rounded-xl shadow-sm mb-4 text-center">
-          <h2 className="text-xl font-bold text-primary mb-1">Julia Rose</h2>
-          <p className="text-sm text-gray-600">Elite Companion in Los Angeles</p>
         </div>
 
         {/* Content Section with two columns */}
@@ -108,50 +208,61 @@ export default function ListingDetailPage() {
               </span>
             </div>
 
-            {/* Main Photo Gallery */}
-            <div className="mb-6">
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-3">
-                  <div className="rounded-lg overflow-hidden h-80">
-                    <Image
-                      src="/sophisticated-evening.png"
-                      alt="Elite Companion"
-                      width={634}
-                      height={634}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            {/* Full-width Gallery */}
+            <div className="mb-8 relative bg-gray-900 p-0 rounded-xl overflow-hidden">              
+              <div className="full-width-gallery-container">
+                <Swiper
+                  modules={[Navigation, Pagination, FreeMode]}
+                  spaceBetween={0}
+                  slidesPerView={4}
+                  breakpoints={{
+                    320: { slidesPerView: 1.25, spaceBetween: 0 },
+                    640: { slidesPerView: 2.5, spaceBetween: 0 },
+                    1024: { slidesPerView: 3, spaceBetween: 0 },
+                    1280: { slidesPerView: 4, spaceBetween: 0 },
+                  }}
+                  navigation={{
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                  }}
+                  pagination={{
+                    clickable: true,
+                    bulletClass: 'custom-bullet',
+                    bulletActiveClass: 'custom-bullet-active',
+                  }}
+                  onSlideChange={(swiper) => setActiveSlide(swiper.activeIndex)}
+                  className="full-width-gallery"
+                >
+                  {galleryImages.map((image, index) => (
+                    <SwiperSlide 
+                      key={index}
+                      className="full-width-slide"
+                      onClick={() => handleOpenFullscreen(index)}
+                    >
+                      <div className="relative overflow-hidden">
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                
+                {/* Custom Navigation Arrows */}
+                <div className="swiper-button-prev custom-prev">
+                  <ChevronLeft className="text-white w-6 h-6" />
                 </div>
-                <div className="photo-gallery-item h-40 relative overflow-hidden rounded-lg cursor-pointer">
-                  <Image
-                    src="/confident-professional.png"
-                    alt="Elite Companion"
-                    width={634}
-                    height={634}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
-                  />
+                <div className="swiper-button-next custom-next">
+                  <ChevronRight className="text-white w-6 h-6" />
                 </div>
-                <div className="photo-gallery-item h-40 relative overflow-hidden rounded-lg cursor-pointer">
-                  <Image
-                    src="/sapphire-serenity.png"
-                    alt="Elite Companion"
-                    width={634}
-                    height={634}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
-                  />
-                </div>
-                <div className="photo-gallery-item h-40 relative overflow-hidden rounded-lg cursor-pointer">
-                  <Image
-                    src="/elegant-gaze.png"
-                    alt="Elite Companion"
-                    width={634}
-                    height={634}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold text-lg">
-                    <span>+2 More</span>
-                  </div>
-                </div>
+                
+                {/* Red progress bar */}
+                <div className="gallery-progress-bar"></div>
               </div>
             </div>
 
@@ -281,37 +392,24 @@ export default function ListingDetailPage() {
 
               {/* Contact Buttons */}
               <Link
-                href="tel:+11234567890"
+                href={`tel:${contactInfo.phone}`}
                 className="block w-full bg-primary text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-primary-light transition mb-3"
               >
-                <Phone className="inline-block mr-2 h-4 w-4" /> Call Now: (123) 456-7890
+                <PhoneIcon className="inline-block mr-2 h-4 w-4" /> Call Now: {contactInfo.formattedPhone}
               </Link>
               <Link
-                href="#"
-                className="block w-full bg-green-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition mb-3"
+                href={`https://wa.me/${contactInfo.whatsapp}`}
+                className="block w-full bg-[#25D366] text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition mb-3"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="inline-block mr-2 h-4 w-4"
-                >
-                  <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-                  <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-                  <path d="M13 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-                  <path d="M9 14a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1h-5a.5.5 0 0 0-.5.5Z" />
-                </svg>{" "}
-                WhatsApp
+                <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp
               </Link>
               <Link
-                href="#"
+                href={`mailto:${contactInfo.email}`}
                 className="block w-full bg-gray-200 text-gray-700 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition"
               >
-                <MessageSquare className="inline-block mr-2 h-4 w-4" /> Send Message
+                <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Message
               </Link>
 
               {/* Availability */}
@@ -410,39 +508,85 @@ export default function ListingDetailPage() {
 
       {/* Fixed Mobile Contact Buttons */}
       {showMobileButtons && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-2 flex justify-between z-50 md:hidden">
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-2 flex gap-2 z-50 md:hidden">
           <Link
-            href="tel:+11234567890"
-            className="flex-1 flex items-center justify-center bg-blue-500 text-white text-center py-4 rounded-2xl mx-1"
+            href={`tel:${contactInfo.phone}`}
+            className="flex-grow flex items-center justify-start bg-blue-600 text-white font-bold text-center py-3 px-4 rounded-md"
+            aria-label={`Call ${contactInfo.formattedPhone}`}
           >
-            <Phone className="h-6 w-6" />
+            <PhoneIcon className="h-6 w-6 mr-2 flex-shrink-0" />
+            <span className="text-base sm:text-lg whitespace-nowrap overflow-hidden text-ellipsis">{contactInfo.formattedPhone}</span>
           </Link>
           <Link
-            href="#"
-            className="flex-1 flex items-center justify-center bg-green-500 text-white text-center py-4 rounded-2xl mx-1"
+            href={`https://wa.me/${contactInfo.whatsapp}`}
+            className="flex items-center justify-center bg-[#25D366] text-white text-center p-3 rounded-md w-14 h-14 flex-shrink-0"
+            aria-label="WhatsApp"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-              <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-              <path d="M13 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-              <path d="M9 14a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1h-5a.5.5 0 0 0-.5.5Z" />
-            </svg>
+            <WhatsAppIcon className="h-7 w-7" />
           </Link>
           <Link
-            href="#"
-            className="flex-1 flex items-center justify-center bg-gray-200 text-gray-700 text-center py-4 rounded-2xl mx-1"
+            href={`mailto:${contactInfo.email}`}
+            className="flex items-center justify-center bg-gray-200 text-gray-800 text-center p-3 rounded-md w-14 h-14 flex-shrink-0"
+            aria-label="Email"
           >
-            <MessageSquare className="h-6 w-6" />
+            <EmailIcon className="h-7 w-7" />
           </Link>
+        </div>
+      )}
+      
+      {/* Fullscreen Gallery */}
+      {fullscreenActive && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-95 z-[9999] flex items-center justify-center"
+          onClick={handleCloseFullscreen}
+        >
+          <div 
+            className="relative max-w-[90%] max-h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={galleryImages[fullscreenIndex].src}
+              alt={galleryImages[fullscreenIndex].alt}
+              width={1200}
+              height={800}
+              className="max-h-[80vh] w-auto object-contain rounded-md"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            />
+          </div>
+          
+          <button 
+            className="absolute top-4 right-4 bg-opacity-20 bg-white rounded-full w-10 h-10 flex items-center justify-center text-white"
+            onClick={handleCloseFullscreen}
+          >
+            <X size={24} />
+          </button>
+          
+          <button 
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-opacity-20 bg-white rounded-full w-12 h-12 flex items-center justify-center text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePrevImage();
+            }}
+          >
+            <ChevronLeft size={28} />
+          </button>
+          
+          <button 
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-opacity-20 bg-white rounded-full w-12 h-12 flex items-center justify-center text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNextImage();
+            }}
+          >
+            <ChevronRight size={28} />
+          </button>
+          
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm">
+            {fullscreenIndex + 1} / {galleryImages.length}
+          </div>
         </div>
       )}
     </div>

@@ -1,0 +1,241 @@
+/* Swiper Customization */
+.swiper-button-prev, 
+.swiper-button-next {
+  display: none;
+}
+
+.swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background-color: #fff;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #fff;
+  opacity: 1;
+}
+
+.swiper-slide {
+  width: auto;
+}
+
+/* Gallery Hover Effects */
+.gallery-image {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.gallery-grid:hover .gallery-image {
+  filter: brightness(0.9);
+}
+
+.gallery-grid .gallery-image:hover {
+  transform: scale(1.05);
+  filter: brightness(1);
+}
+
+.more-overlay {
+  transition: background-color 0.3s ease;
+}
+
+.more-overlay:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Full-width Gallery */
+.full-width-gallery-container {
+  position: relative;
+  width: 100%;
+  background-color: #121419;
+  padding: 0;
+}
+
+.full-width-gallery {
+  overflow: hidden;
+  margin: 0;
+}
+
+.full-width-slide {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 2px !important; /* Even gap between slides */
+  height: auto !important;
+}
+
+.full-width-slide .relative {
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  margin: 0;
+  height: 0;
+  padding-bottom: 100%; /* Square aspect ratio */
+}
+
+.full-width-slide:hover .relative {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Ensure consistent image size */
+.full-width-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Ensure no gaps between slides */
+.swiper-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .full-width-slide {
+    width: 33.333% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .full-width-slide {
+    width: 80% !important;
+    padding: 0 3px !important;
+  }
+}
+
+/* Gallery progress bar */
+.gallery-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: #e1173f;
+  z-index: 10;
+}
+
+/* Custom Navigation */
+.custom-prev,
+.custom-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+.custom-prev {
+  left: 20px;
+}
+
+.custom-next {
+  right: 20px;
+}
+
+.custom-prev:hover,
+.custom-next:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Pagination bullets */
+.custom-bullet {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+.custom-bullet-active {
+  background: #ffffff;
+  width: 10px;
+  height: 10px;
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 15px;
+  text-align: center;
+  z-index: 20;
+  width: 100%;
+}
+
+/* Small screen adjustments */
+@media (max-width: 640px) {
+  .gallery-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .small-images {
+    margin-top: 8px;
+  }
+  
+  .custom-prev {
+    left: 10px;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .custom-next {
+    right: 10px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Scroll Indicator for Thumbnail Slider */
+.scroll-indicator {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: #ff385c;
+  border-radius: 3px;
+  transform-origin: left;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Custom thumbnail focus style */
+.swiper-slide .border-primary {
+  border-color: #ff385c;
+  box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.3);
+}
+
+/* Gallery thumbnails scrollbar */
+.thumbnail-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.thumbnail-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.thumbnail-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.thumbnail-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} 

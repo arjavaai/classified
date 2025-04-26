@@ -9,170 +9,7 @@ import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import ImageCarousel from "@/components/listing-card/ImageCarousel"
-import SimpleCarousel from "@/components/listing-card/SimpleCarousel"
-
-// Define the Listing interface
-interface Listing {
-  id: number
-  title: string
-  description: string
-  age: number
-  location: string
-  price: number
-  image: string
-  images?: string[]
-  photoCount: number
-  isTop: boolean
-  state: string
-  city: string
-  services: string[]
-  ethnicity: string
-  nationality: string
-  bodyType: string
-  breastType: string
-  hairColor: string
-  catersTo: string[]
-  placeOfService: string[]
-}
-
-// Sample data for demonstration
-const sampleListings: Listing[] = [
-  {
-    id: 1,
-    title: "GENUINE Cash in hand payment HIGH PROFILE SERVICE AVAILABLE IN LA",
-    description:
-      "Call me for HAND PAYMENT ONLY genuine Escorts Services Safe & Secure High Class Services Affordable Rate 100% satisfaction guaranteed",
-    age: 21,
-    location: "Los Angeles / Beverly Hills",
-    price: 150,
-    image: "/elegant-gaze.png",
-    images: ["/elegant-gaze.png", "/sophisticated-evening.png", "/confident-professional.png"],
-    photoCount: 5,
-    isTop: true,
-    state: "CA",
-    city: "los-angeles",
-    services: ["Girlfriend experience", "Massage", "Outcall"],
-    ethnicity: "Caucasian",
-    nationality: "American",
-    bodyType: "Slender",
-    breastType: "Natural Boobs",
-    hairColor: "Blond Hair",
-    catersTo: ["Men"],
-    placeOfService: ["Incall", "Outcall"],
-  },
-  {
-    id: 2,
-    title: "Elite Companion Services in LA - Cash Payment Only",
-    description:
-      "High-end companionship service providing elegant, educated escorts for social events and private moments. Genuine photos and professional service guaranteed.",
-    age: 24,
-    location: "Los Angeles / Santa Monica",
-    price: 250,
-    image: "/confident-professional.png",
-    images: ["/confident-professional.png", "/sapphire-serenity.png", "/sophisticated-evening.png"],
-    photoCount: 5,
-    isTop: true,
-    state: "CA",
-    city: "los-angeles",
-    services: ["Girlfriend experience", "Dinner dates", "Travel companion", "Events"],
-    ethnicity: "Caucasian",
-    nationality: "American",
-    bodyType: "Athletic",
-    breastType: "Natural Boobs",
-    hairColor: "Brown Hair",
-    catersTo: ["Men", "Couples"],
-    placeOfService: ["Hotel / Motel", "Events and parties"],
-  },
-  {
-    id: 3,
-    title: "African Escort - Premium Service",
-    description:
-      "Exclusive premium service with a beautiful African escort. Discreet and professional service guaranteed.",
-    age: 26,
-    location: "Los Angeles / Hollywood",
-    price: 180,
-    image: "/confident-african-professional.png",
-    images: ["/confident-african-professional.png", "/sophisticated-evening.png", "/elegant-gaze.png"],
-    photoCount: 4,
-    isTop: false,
-    state: "CA",
-    city: "los-angeles",
-    services: ["Massage", "Incall", "Outcall"],
-    ethnicity: "Ebony",
-    nationality: "South African",
-    bodyType: "Athletic",
-    breastType: "Busty",
-    hairColor: "Black Hair",
-    catersTo: ["Men", "Women"],
-    placeOfService: ["Incall", "Outcall"],
-  },
-  {
-    id: 4,
-    title: "High Profile College Girl Available",
-    description: "Young, educated college girl available for companionship and more. Genuine service with real photos.",
-    age: 22,
-    location: "Beverly Hills",
-    price: 200,
-    image: "/sapphire-serenity.png",
-    images: ["/sapphire-serenity.png", "/confident-professional.png", "/elegant-gaze.png"],
-    photoCount: 3,
-    isTop: false,
-    state: "CA",
-    city: "los-angeles",
-    services: ["Role play", "Girlfriend experience", "Incall"],
-    ethnicity: "Asian",
-    nationality: "Japanese",
-    bodyType: "Slender",
-    breastType: "Natural Boobs",
-    hairColor: "Black Hair",
-    catersTo: ["Men"],
-    placeOfService: ["At home", "Incall"],
-  },
-  {
-    id: 5,
-    title: "VIP Escort Service in Miami",
-    description: "Luxury escort service in Miami. Available for high-end clients and events.",
-    age: 25,
-    location: "Miami / South Beach",
-    price: 300,
-    image: "/miami-chic.png",
-    images: ["/miami-chic.png", "/sapphire-serenity.png", "/confident-professional.png"],
-    photoCount: 6,
-    isTop: true,
-    state: "FL",
-    city: "miami",
-    services: ["Travel companion", "Events", "Dinner dates"],
-    ethnicity: "Latin",
-    nationality: "Brazilian",
-    bodyType: "Curvy",
-    breastType: "Busty",
-    hairColor: "Brown Hair",
-    catersTo: ["Men", "Couples"],
-    placeOfService: ["Hotel / Motel", "Events and parties"],
-  },
-  {
-    id: 6,
-    title: "New York Elite Model Escort",
-    description: "Professional model offering exclusive escort services in Manhattan and surrounding areas.",
-    age: 27,
-    location: "New York / Manhattan",
-    price: 350,
-    image: "/city-chic-portrait.png",
-    images: ["/city-chic-portrait.png", "/elegant-gaze.png", "/confident-professional.png"],
-    photoCount: 7,
-    isTop: true,
-    state: "NY",
-    city: "new-york",
-    services: ["Events", "Travel companion", "Girlfriend experience"],
-    ethnicity: "Caucasian",
-    nationality: "Russian",
-    bodyType: "Athletic",
-    breastType: "Natural Boobs",
-    hairColor: "Blond Hair",
-    catersTo: ["Men"],
-    placeOfService: ["Hotel / Motel", "Outcall"],
-  },
-]
+import { getFilteredListings, EscortListing } from "@/lib/demo-data"
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams()
@@ -189,100 +26,65 @@ export default function SearchResultsPage() {
   const catersToParam = searchParams.get("catersTo") || ""
   const placeOfServiceParam = searchParams.get("placeOfService") || ""
 
-  const [filteredListings, setFilteredListings] = useState<Listing[]>(sampleListings)
+  const [filteredListings, setFilteredListings] = useState<EscortListing[]>([])
 
   useEffect(() => {
-    // Filter listings based on search parameters
-    let results = sampleListings
-
-    // Apply text search filter
-    if (query) {
-      results = results.filter(
-        (listing) =>
-          listing.title.toLowerCase().includes(query.toLowerCase()) ||
-          listing.description.toLowerCase().includes(query.toLowerCase()) ||
-          listing.location.toLowerCase().includes(query.toLowerCase()),
-      )
+    // Parse the parameters
+    const ethnicity = ethnicityParam ? ethnicityParam.split(",") : []
+    const nationality = nationalityParam ? nationalityParam.split(",") : []
+    const bodyType = bodyTypeParam ? bodyTypeParam.split(",") : []
+    const breastType = breastTypeParam ? breastTypeParam.split(",") : []
+    const hairColor = hairColorParam ? hairColorParam.split(",") : []
+    const ageRanges = ageRangeParam ? ageRangeParam.split(",") : []
+    const services = servicesParam ? servicesParam.split(",") : []
+    const catersTo = catersToParam ? catersToParam.split(",") : []
+    const placeOfService = placeOfServiceParam ? placeOfServiceParam.split(",") : []
+    
+    // Parse age ranges and get min/max values
+    let minAge: number | undefined = undefined
+    let maxAge: number | undefined = undefined
+    
+    if (ageRanges.length > 0) {
+      ageRanges.forEach(range => {
+        if (range === "18-19") {
+          minAge = minAge !== undefined ? Math.min(minAge, 18) : 18
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 19) : 19
+        } else if (range === "20s") {
+          minAge = minAge !== undefined ? Math.min(minAge, 20) : 20
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 29) : 29
+        } else if (range === "30s") {
+          minAge = minAge !== undefined ? Math.min(minAge, 30) : 30
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 39) : 39
+        } else if (range === "40s") {
+          minAge = minAge !== undefined ? Math.min(minAge, 40) : 40
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 49) : 49
+        } else if (range === "50s") {
+          minAge = minAge !== undefined ? Math.min(minAge, 50) : 50
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 59) : 59
+        } else if (range === "60+") {
+          minAge = minAge !== undefined ? Math.min(minAge, 60) : 60
+          maxAge = maxAge !== undefined ? Math.max(maxAge, 100) : 100
+        }
+      })
     }
-
-    // Apply state filter
-    if (state) {
-      results = results.filter((listing) => listing.state === state)
-    }
-
-    // Apply city filter
-    if (city) {
-      results = results.filter((listing) => listing.city === city)
-    }
-
-    // Apply ethnicity filter
-    if (ethnicityParam) {
-      const ethnicities = ethnicityParam.split(",")
-      results = results.filter((listing) => ethnicities.includes(listing.ethnicity))
-    }
-
-    // Apply nationality filter
-    if (nationalityParam) {
-      const nationalities = nationalityParam.split(",")
-      results = results.filter((listing) => nationalities.includes(listing.nationality))
-    }
-
-    // Apply body type filter
-    if (bodyTypeParam) {
-      const bodyTypes = bodyTypeParam.split(",")
-      results = results.filter((listing) => bodyTypes.includes(listing.bodyType))
-    }
-
-    // Apply breast type filter
-    if (breastTypeParam) {
-      const breastTypes = breastTypeParam.split(",")
-      results = results.filter((listing) => breastTypes.includes(listing.breastType))
-    }
-
-    // Apply hair color filter
-    if (hairColorParam) {
-      const hairColors = hairColorParam.split(",")
-      results = results.filter((listing) => hairColors.includes(listing.hairColor))
-    }
-
-    // Apply age range filter
-    if (ageRangeParam) {
-      const ageRanges = ageRangeParam.split(",")
-      // This is a simplified implementation - in a real app, you'd need to parse the age ranges
-      // and check if the listing's age falls within any of the selected ranges
-      if (ageRanges.includes("18-19")) {
-        results = results.filter((listing) => listing.age >= 18 && listing.age <= 19)
-      } else if (ageRanges.includes("20s")) {
-        results = results.filter((listing) => listing.age >= 20 && listing.age <= 29)
-      } else if (ageRanges.includes("30s")) {
-        results = results.filter((listing) => listing.age >= 30 && listing.age <= 39)
-      } else if (ageRanges.includes("40s")) {
-        results = results.filter((listing) => listing.age >= 40 && listing.age <= 49)
-      } else if (ageRanges.includes("50s")) {
-        results = results.filter((listing) => listing.age >= 50 && listing.age <= 59)
-      } else if (ageRanges.includes("60+")) {
-        results = results.filter((listing) => listing.age >= 60)
-      }
-    }
-
-    // Apply services filter
-    if (servicesParam) {
-      const services = servicesParam.split(",")
-      results = results.filter((listing) => services.some((service) => listing.services.includes(service)))
-    }
-
-    // Apply caters to filter
-    if (catersToParam) {
-      const catersTo = catersToParam.split(",")
-      results = results.filter((listing) => catersTo.some((caterTo) => listing.catersTo.includes(caterTo)))
-    }
-
-    // Apply place of service filter
-    if (placeOfServiceParam) {
-      const placesOfService = placeOfServiceParam.split(",")
-      results = results.filter((listing) => placesOfService.some((place) => listing.placeOfService.includes(place)))
-    }
-
+    
+    // Use the getFilteredListings function
+    const results = getFilteredListings({
+      query,
+      state,
+      city,
+      ethnicity,
+      nationality,
+      bodyType,
+      breastType,
+      hairColor,
+      minAge,
+      maxAge,
+      services,
+      catersTo,
+      placeOfService
+    })
+    
     setFilteredListings(results)
   }, [
     query,
@@ -311,15 +113,19 @@ export default function SearchResultsPage() {
           </Link>
           <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
           <Link href="#" className="text-gray-600 hover:text-primary">
-            California Escorts
+            {state ? `${state} Escorts` : "All States"}
           </Link>
-          <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-          <span className="text-accent-blue font-medium">Los Angeles Escorts</span>
+          {city && (
+            <>
+              <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
+              <span className="text-accent-blue font-medium">{city} Escorts</span>
+            </>
+          )}
         </div>
 
         {/* Location Heading */}
         <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
-          {query ? `Search Results for "${query}"` : "Los Angeles Escorts"}
+          {query ? `Search Results for "${query}"` : (city ? `${city} Escorts` : (state ? `${state} Escorts` : "All Escorts"))}
         </h1>
 
         {/* Search Results Date */}
@@ -335,7 +141,7 @@ export default function SearchResultsPage() {
         {/* Search Results Listings */}
         {filteredListings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8">
-            {filteredListings.map((listing, index) => (
+            {filteredListings.map((listing) => (
               <Link href={`/listing/${listing.id}`} key={listing.id} className="block no-underline text-black">
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden flex hover:shadow-md transition-shadow">
                   <ImageCarousel 
@@ -405,6 +211,56 @@ export default function SearchResultsPage() {
             </div>
           </div>
         )}
+
+        {/* SEO Content Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-10">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Discover Exclusive Escort Services</h2>
+          
+          <div className="relative">
+            <div className={`text-gray-700 overflow-hidden transition-all duration-300`} 
+                 id="seoContent" 
+                 style={{ maxHeight: "200px" }}>
+              <p className="mb-3">
+                Welcome to Skluva's premium escort directory. Our platform connects you with sophisticated, verified companions who provide exceptional experiences tailored to your preferences and desires.
+              </p>
+              
+              <p className="mb-3">
+                Our verified escorts are the perfect companions for various occasions, from business events to private encounters.
+              </p>
+              
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Why Choose Skluva for Your Escort Needs</h3>
+              
+              <ul className="list-disc pl-5 mb-4 text-gray-700">
+                <li className="mb-2">Verified profiles with authentic photos and accurate descriptions</li>
+                <li className="mb-2">Diverse selection of companions from various ethnicities and backgrounds</li>
+                <li className="mb-2">Detailed filtering options to find your perfect match</li>
+                <li className="mb-2">Private and discreet service connecting you directly with companions</li>
+                <li className="mb-2">Regular updates with new listings and verified reviews</li>
+              </ul>
+            </div>
+            
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+          </div>
+          
+          <button
+            className="text-primary font-medium hover:underline mt-2 focus:outline-none"
+            id="seoToggle"
+            onClick={() => {
+              const seoContent = document.getElementById('seoContent')
+              if (seoContent) {
+                if (seoContent.style.maxHeight === '200px') {
+                  seoContent.style.maxHeight = 'none'
+                  document.getElementById('seoToggle')!.textContent = 'Read Less'
+                } else {
+                  seoContent.style.maxHeight = '200px'
+                  document.getElementById('seoToggle')!.textContent = 'Read More'
+                }
+              }
+            }}
+          >
+            Read More
+          </button>
+        </div>
 
         <InfoFooter />
         <SiteFooter />

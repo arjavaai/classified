@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,7 @@ import { FilterSection } from "./filter-section"
 import { FilterButton } from "./filter-button"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // Filter options data
 const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
@@ -39,6 +40,22 @@ const placesOfService = ["At home", "Events and parties", "Hotel / Motel", "Club
 export default function SearchModal() {
   const { filters, dispatch, isModalOpen, closeModal } = useSearch()
   const router = useRouter()
+  const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
+  const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([])
+
+  // Load states when component mounts
+  useEffect(() => {
+    setStatesList(getStates())
+  }, [])
+
+  // Load cities when state changes
+  useEffect(() => {
+    if (filters.state) {
+      setCitiesList(getCitiesByStateCode(filters.state))
+    } else {
+      setCitiesList([])
+    }
+  }, [filters.state])
 
   // Prevent body scrolling when modal is open
   useEffect(() => {
@@ -150,30 +167,26 @@ export default function SearchModal() {
                   aria-label="Select state"
                 >
                   <option value="">States</option>
-                  <option value="AL">Alabama</option>
-                  <option value="AK">Alaska</option>
-                  <option value="AZ">Arizona</option>
-                  <option value="CA">California</option>
-                  <option value="CO">Colorado</option>
-                  <option value="FL">Florida</option>
-                  <option value="NY">New York</option>
-                  <option value="TX">Texas</option>
+                  {statesList.map((state) => (
+                    <option key={state.abbreviation} value={state.abbreviation}>
+                      {state.name}
+                    </option>
+                  ))}
                 </select>
 
                 <select
                   className="border border-gray-200 rounded p-2 w-full"
                   value={filters.city}
                   onChange={(e) => dispatch({ type: "SET_CITY", payload: e.target.value })}
+                  disabled={!filters.state}
                   aria-label="Select city"
                 >
                   <option value="">All the cities</option>
-                  <option value="los-angeles">Los Angeles</option>
-                  <option value="san-francisco">San Francisco</option>
-                  <option value="san-diego">San Diego</option>
-                  <option value="new-york">New York</option>
-                  <option value="miami">Miami</option>
-                  <option value="chicago">Chicago</option>
-                  <option value="houston">Houston</option>
+                  {citiesList.map((city) => (
+                    <option key={city.slug} value={city.slug}>
+                      {city.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

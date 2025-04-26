@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "@/components/ui/use-toast"
 import { Camera, Check, ChevronRight, ChevronLeft, X, Upload } from "lucide-react"
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // Types
 export type AdFormData = {
@@ -81,6 +82,15 @@ export default function CreateAdForm() {
     photos: [],
     termsAccepted: false,
   })
+  const [tab, setTab] = useState("information")
+  const [loading, setLoading] = useState(false)
+  const [cities, setCities] = useState<string[]>([])
+  const [states, setStates] = useState<{name: string; abbreviation: string}[]>([])
+
+  // Load states when component mounts
+  useEffect(() => {
+    setStates(getStates())
+  }, [])
 
   const steps = [
     { title: "Ad Type", description: "Choose your ad type" },
@@ -89,8 +99,7 @@ export default function CreateAdForm() {
     { title: "Finish", description: "Review and publish" },
   ]
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleInputChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -611,214 +620,197 @@ export default function CreateAdForm() {
       </div>
 
       <div className="space-y-4">
-        {/* Basic Information */}
-        <div className="space-y-4">
+        <Label>
+          Your Name <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          placeholder="Your name (not displayed publicly)"
+          value={formData.firstName}
+          onChange={(e) => handleInputChange("firstName", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          Ad Title <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          placeholder="Create a catchy title for your ad"
+          value={formData.title}
+          onChange={(e) => handleInputChange("title", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          Description <span className="text-red-500">*</span>
+        </Label>
+        <Textarea
+          placeholder="Describe your services, personality, and what clients can expect"
+          className="min-h-32"
+          value={formData.description}
+          onChange={(e) => handleInputChange("description", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          Location <span className="text-red-500">*</span>
+        </Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="firstName">
-              Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-
-          <div>
-            <Label>Category</Label>
-            <Input value="Escort" disabled className="bg-muted cursor-not-allowed" />
-          </div>
-
-          <div>
-            <Label htmlFor="age">
-              Age <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="age"
-              name="age"
-              type="number"
-              min="18"
-              max="99"
-              value={formData.age}
-              onChange={handleInputChange}
-              placeholder="Enter your age"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Contact Information */}
-        <div className="space-y-4">
-          <Label>
-            How would you like to be connected? <span className="text-red-500">*</span>
-          </Label>
-          <RadioGroup
-            value={formData.contactPreference}
-            onValueChange={(value) => handleSelectChange("contactPreference", value as "email" | "phone" | "both")}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-2 border p-3 rounded-md">
-              <RadioGroupItem value="email" id="email-only" />
-              <Label htmlFor="email-only" className="cursor-pointer">
-                Only Email
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 border p-3 rounded-md">
-              <RadioGroupItem value="phone" id="phone-only" />
-              <Label htmlFor="phone-only" className="cursor-pointer">
-                Only Phone
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 border p-3 rounded-md">
-              <RadioGroupItem value="both" id="both" />
-              <Label htmlFor="both" className="cursor-pointer">
-                Email & Phone
-              </Label>
-            </div>
-          </RadioGroup>
-
-          {(formData.contactPreference === "email" || formData.contactPreference === "both") && (
-            <div>
-              <Label htmlFor="email">
-                Email <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-          )}
-
-          {(formData.contactPreference === "phone" || formData.contactPreference === "both") && (
-            <div>
-              <Label htmlFor="phone">
-                Phone <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-                placeholder="Enter your phone number"
-                required
-              />
-            </div>
-          )}
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="whatsapp"
-              checked={formData.whatsapp}
-              onCheckedChange={(checked) => handleCheckboxChange("whatsapp", checked as boolean)}
-            />
-            <Label htmlFor="whatsapp" className="cursor-pointer">
-              Available on WhatsApp
-            </Label>
-          </div>
-        </div>
-
-        {/* Location */}
-        <div className="space-y-4">
-          <Label>
-            Location <span className="text-red-500">*</span>
-          </Label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Select
-                value={formData.state}
-                onValueChange={(value) => {
-                  handleSelectChange("state", value)
-                  handleSelectChange("city", "")
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select State" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AL">Alabama</SelectItem>
-                  <SelectItem value="AK">Alaska</SelectItem>
-                  <SelectItem value="AZ">Arizona</SelectItem>
-                  <SelectItem value="CA">California</SelectItem>
-                  <SelectItem value="CO">Colorado</SelectItem>
-                  <SelectItem value="FL">Florida</SelectItem>
-                  <SelectItem value="GA">Georgia</SelectItem>
-                  <SelectItem value="HI">Hawaii</SelectItem>
-                  <SelectItem value="IL">Illinois</SelectItem>
-                  <SelectItem value="NY">New York</SelectItem>
-                  <SelectItem value="TX">Texas</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Select
-                value={formData.city}
-                onValueChange={(value) => handleSelectChange("city", value)}
-                disabled={!formData.state}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select City" />
-                </SelectTrigger>
-                <SelectContent>
-                  {formData.state &&
-                    cityData[formData.state]?.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Title and Description */}
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="title">
-              Title <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="Enter your ad title"
-              required
-            />
+            <Select
+              value={formData.state}
+              onValueChange={(value) => {
+                handleSelectChange("state", value)
+                handleSelectChange("city", "")
+                // Load cities for this state
+                const citiesData = getCitiesByStateCode(value)
+                setCities(citiesData.map(city => city.name))
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select State" />
+              </SelectTrigger>
+              <SelectContent>
+                {states.map(state => (
+                  <SelectItem key={state.abbreviation} value={state.abbreviation}>
+                    {state.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <Label htmlFor="description">
-              Description <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Tell potential clients about yourself and your services..."
-              rows={5}
-              required
-            />
+            <Select value={formData.city} onValueChange={(value) => handleSelectChange("city", value)} disabled={!formData.state}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select City" />
+              </SelectTrigger>
+              <SelectContent>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
-      {/* Physical Attributes */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Physical Attributes</h3>
+        <Label>
+          Category <span className="text-red-500">*</span>
+        </Label>
+        <Input value="Escort" disabled className="bg-muted cursor-not-allowed" />
+      </div>
 
-        <div>
+      <div className="space-y-4">
+        <Label>
+          Age <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          type="number"
+          min="18"
+          max="99"
+          value={formData.age}
+          onChange={(e) => handleInputChange("age", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          How would you like to be connected? <span className="text-red-500">*</span>
+        </Label>
+        <RadioGroup
+          value={formData.contactPreference}
+          onValueChange={(value) => handleSelectChange("contactPreference", value as "email" | "phone" | "both")}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2 border p-3 rounded-md">
+            <RadioGroupItem value="email" id="email-only" />
+            <Label htmlFor="email-only" className="cursor-pointer">
+              Only Email
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 border p-3 rounded-md">
+            <RadioGroupItem value="phone" id="phone-only" />
+            <Label htmlFor="phone-only" className="cursor-pointer">
+              Only Phone
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 border p-3 rounded-md">
+            <RadioGroupItem value="both" id="both" />
+            <Label htmlFor="both" className="cursor-pointer">
+              Email & Phone
+            </Label>
+          </div>
+        </RadioGroup>
+
+        {(formData.contactPreference === "email" || formData.contactPreference === "both") && (
+          <div>
+            <Label htmlFor="email">
+              Email <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+        )}
+
+        {(formData.contactPreference === "phone" || formData.contactPreference === "both") && (
+          <div>
+            <Label htmlFor="phone">
+              Phone <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              placeholder="Enter your phone number"
+              required
+            />
+          </div>
+        )}
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="whatsapp"
+            checked={formData.whatsapp}
+            onCheckedChange={(checked) => handleCheckboxChange("whatsapp", checked as boolean)}
+          />
+          <Label htmlFor="whatsapp" className="cursor-pointer">
+            Available on WhatsApp
+          </Label>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          Nationality <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          value={formData.nationality}
+          onChange={(e) => handleInputChange("nationality", e.target.value)}
+          placeholder="Enter your nationality"
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label>
+          Physical Attributes
+        </Label>
+
+        <div className="space-y-2">
           <Label>Ethnicity</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Asian" category="ethnicity" value="asian" />
@@ -831,18 +823,7 @@ export default function CreateAdForm() {
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="nationality">Nationality</Label>
-          <Input
-            id="nationality"
-            name="nationality"
-            value={formData.nationality}
-            onChange={handleInputChange}
-            placeholder="Enter your nationality"
-          />
-        </div>
-
-        <div>
+        <div className="space-y-2">
           <Label>Body Type</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Athletic" category="bodyType" value="athletic" />
@@ -854,7 +835,7 @@ export default function CreateAdForm() {
           </div>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label>Breast Type</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Natural" category="breastType" value="natural" />
@@ -862,7 +843,7 @@ export default function CreateAdForm() {
           </div>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label>Hair Color</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Black" category="hairColor" value="black" />
@@ -874,11 +855,12 @@ export default function CreateAdForm() {
         </div>
       </div>
 
-      {/* Services */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Services</h3>
+        <Label>
+          Services
+        </Label>
 
-        <div>
+        <div className="space-y-2">
           <Label>Services Offered</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Massage" category="services" value="massage" />
@@ -890,7 +872,7 @@ export default function CreateAdForm() {
           </div>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label>Caters To</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Men" category="catersTo" value="men" />
@@ -899,7 +881,7 @@ export default function CreateAdForm() {
           </div>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label>Place of Service</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <FilterButton label="Incall" category="placeOfService" value="incall" />
@@ -908,9 +890,10 @@ export default function CreateAdForm() {
         </div>
       </div>
 
-      {/* Rates */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Rates</h3>
+        <Label>
+          Rates
+        </Label>
 
         {formData.placeOfService.includes("incall") && (
           <div>

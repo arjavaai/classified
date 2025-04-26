@@ -6,6 +6,8 @@ import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
+import { getFilteredAds } from "@/lib/ads-data"
 
 interface SearchModalProps {
   isOpen: boolean
@@ -18,6 +20,23 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
   const [selectedState, setSelectedState] = useState("")
   const [selectedCity, setSelectedCity] = useState("")
   const [priceRange, setPriceRange] = useState([0, 1000])
+  const [cities, setCities] = useState<{name: string; slug: string}[]>([])
+  const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
+
+  // Load states when component mounts
+  useEffect(() => {
+    setStatesList(getStates())
+  }, [])
+
+  // Load cities when state changes
+  useEffect(() => {
+    if (selectedState) {
+      setCities(getCitiesByStateCode(selectedState))
+      setSelectedCity("") // Reset city when state changes
+    } else {
+      setCities([])
+    }
+  }, [selectedState])
 
   // Filter selections
   const [selectedEthnicity, setSelectedEthnicity] = useState<string[]>([])
@@ -86,24 +105,63 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
     setSelectedPlaceOfService([])
   }
 
+  // Parse age ranges to get min and max values
+  const parseAgeRanges = (ageRanges: string[]) => {
+    let minAge: number | undefined = undefined;
+    let maxAge: number | undefined = undefined;
+    
+    ageRanges.forEach(range => {
+      if (range === "18-19") {
+        minAge = minAge ? Math.min(minAge, 18) : 18;
+        maxAge = maxAge ? Math.max(maxAge, 19) : 19;
+      } else if (range === "20s") {
+        minAge = minAge ? Math.min(minAge, 20) : 20;
+        maxAge = maxAge ? Math.max(maxAge, 29) : 29;
+      } else if (range === "30s") {
+        minAge = minAge ? Math.min(minAge, 30) : 30;
+        maxAge = maxAge ? Math.max(maxAge, 39) : 39;
+      } else if (range === "40s") {
+        minAge = minAge ? Math.min(minAge, 40) : 40;
+        maxAge = maxAge ? Math.max(maxAge, 49) : 49;
+      } else if (range === "50s") {
+        minAge = minAge ? Math.min(minAge, 50) : 50;
+        maxAge = maxAge ? Math.max(maxAge, 59) : 59;
+      } else if (range === "60+") {
+        minAge = minAge ? Math.min(minAge, 60) : 60;
+        maxAge = maxAge ? Math.max(maxAge, 100) : 100;
+      }
+    });
+    
+    return { minAge, maxAge };
+  };
+
   // Handle search
   const handleSearch = () => {
-    onSearch({
-      searchText,
+    const { minAge, maxAge } = parseAgeRanges(selectedAgeRange);
+    
+    const filters = {
+      query: searchText,
       state: selectedState,
       city: selectedCity,
-      priceRange,
       ethnicity: selectedEthnicity,
       nationality: selectedNationality,
       bodyType: selectedBodyType,
       breastType: selectedBreastType,
       hairColor: selectedHairColor,
-      ageRange: selectedAgeRange,
       services: selectedServices,
       catersTo: selectedCatersTo,
       placeOfService: selectedPlaceOfService,
-    })
-    onClose()
+      minAge,
+      maxAge,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+    };
+    
+    // Use getFilteredAds to filter ads based on criteria
+    const filteredAds = getFilteredAds(filters);
+    
+    onSearch(filteredAds);
+    onClose();
   }
 
   // Prevent body scrolling when modal is open
@@ -147,29 +205,25 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
               onChange={(e) => setSelectedState(e.target.value)}
             >
               <option value="">States</option>
-              <option value="AL">Alabama</option>
-              <option value="AK">Alaska</option>
-              <option value="AZ">Arizona</option>
-              <option value="CA">California</option>
-              <option value="CO">Colorado</option>
-              <option value="FL">Florida</option>
-              <option value="NY">New York</option>
-              <option value="TX">Texas</option>
+              {statesList.map((state) => (
+                <option key={state.abbreviation} value={state.abbreviation}>
+                  {state.name}
+                </option>
+              ))}
             </select>
 
             <select
               className="border border-gray-200 rounded p-2 w-full"
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
+              disabled={!selectedState}
             >
               <option value="">All the cities</option>
-              <option value="los-angeles">Los Angeles</option>
-              <option value="san-francisco">San Francisco</option>
-              <option value="san-diego">San Diego</option>
-              <option value="new-york">New York</option>
-              <option value="miami">Miami</option>
-              <option value="chicago">Chicago</option>
-              <option value="houston">Houston</option>
+              {cities.map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
             </select>
           </div>
 

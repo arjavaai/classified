@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // City data for dropdown
 const cityData: Record<string, string[]> = {
@@ -48,28 +49,41 @@ interface AdFormData {
 export default function AdFormStep1() {
   const { state, dispatch } = useAdCreation()
   const [cities, setCities] = useState<string[]>([])
+  const [states, setStates] = useState<{name: string; abbreviation: string}[]>([])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    dispatch({ type: "UPDATE_FORM", payload: { [name]: value } })
-  }
+  // Load states when component mounts
+  useEffect(() => {
+    setStates(getStates())
+  }, [])
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target
-    dispatch({ type: "UPDATE_FORM", payload: { [name]: checked } })
+  // Update cities when state changes
+  useEffect(() => {
+    if (state.state) {
+      const citiesData = getCitiesByStateCode(state.state)
+      setCities(citiesData.map(city => city.name))
+    } else {
+      setCities([])
+    }
+  }, [state.state])
+
+  const handleChange = (field: keyof AdFormData, value: string | boolean | string[]) => {
+    dispatch({
+      type: "UPDATE_FORM",
+      payload: { [field]: value }
+    })
   }
 
   const handleStateChange = (value: string) => {
-    dispatch({ type: "UPDATE_FORM", payload: { state: value, city: "" } })
-    setCities(cityData[value] || [])
+    handleChange("state", value)
+    handleChange("city", "") // Reset city when state changes
   }
 
   const handleCityChange = (value: string) => {
-    dispatch({ type: "UPDATE_FORM", payload: { city: value } })
+    handleChange("city", value)
   }
 
   const handleContactPreferenceChange = (value: "email" | "phone" | "both") => {
-    dispatch({ type: "UPDATE_FORM", payload: { contactPreference: value } })
+    handleChange("contactPreference", value)
   }
 
   const toggleSelection = (
@@ -79,7 +93,7 @@ export default function AdFormStep1() {
     >,
     value: string,
   ) => {
-    dispatch({ type: "TOGGLE_SELECTION", payload: { field, value } })
+    handleChange(field, value)
   }
 
   const goToNextStep = () => {
@@ -110,7 +124,7 @@ export default function AdFormStep1() {
             id="name"
             name="name"
             value={state.name}
-            onChange={handleInputChange}
+            onChange={(e) => handleChange("name", e.target.value)}
             placeholder="Enter Name"
             className="p-4 text-base"
           />
@@ -132,7 +146,7 @@ export default function AdFormStep1() {
             id="age"
             name="age"
             value={state.age}
-            onChange={handleInputChange}
+            onChange={(e) => handleChange("age", e.target.value)}
             min="18"
             max="99"
             placeholder="Enter Age"
@@ -181,7 +195,7 @@ export default function AdFormStep1() {
               id="email"
               name="email"
               value={state.email}
-              onChange={handleInputChange}
+              onChange={(e) => handleChange("email", e.target.value)}
               placeholder="Enter Email"
               className="p-4 text-base"
             />
@@ -199,7 +213,7 @@ export default function AdFormStep1() {
               id="phone"
               name="phone"
               value={state.phone}
-              onChange={handleInputChange}
+              onChange={(e) => handleChange("phone", e.target.value)}
               placeholder="Enter Phone Number"
               className="p-4 text-base"
             />
@@ -211,7 +225,7 @@ export default function AdFormStep1() {
           <Checkbox
             id="whatsapp"
             checked={state.whatsapp}
-            onCheckedChange={(checked) => dispatch({ type: "UPDATE_FORM", payload: { whatsapp: checked === true } })}
+            onCheckedChange={(checked) => handleChange("whatsapp", !!checked)}
           />
           <Label htmlFor="whatsapp">Available on WhatsApp</Label>
         </div>
@@ -228,14 +242,11 @@ export default function AdFormStep1() {
                 <SelectValue placeholder="Select State" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="AL">Alabama</SelectItem>
-                <SelectItem value="AK">Alaska</SelectItem>
-                <SelectItem value="AZ">Arizona</SelectItem>
-                <SelectItem value="CA">California</SelectItem>
-                <SelectItem value="CO">Colorado</SelectItem>
-                <SelectItem value="FL">Florida</SelectItem>
-                <SelectItem value="NY">New York</SelectItem>
-                <SelectItem value="TX">Texas</SelectItem>
+                {states.map(state => (
+                  <SelectItem key={state.abbreviation} value={state.abbreviation}>
+                    {state.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -266,7 +277,7 @@ export default function AdFormStep1() {
             id="title"
             name="title"
             value={state.title}
-            onChange={handleInputChange}
+            onChange={(e) => handleChange("title", e.target.value)}
             placeholder="Enter your ad title"
             className="p-4 text-base"
           />
@@ -281,7 +292,7 @@ export default function AdFormStep1() {
             id="description"
             name="description"
             value={state.description}
-            onChange={handleInputChange}
+            onChange={(e) => handleChange("description", e.target.value)}
             rows={5}
             placeholder="Tell potential clients about yourself and your services..."
             className="p-4 text-base"
@@ -330,7 +341,7 @@ export default function AdFormStep1() {
           <Label className="text-lg mb-2">Nationality</Label>
           <Select
             value={state.nationality}
-            onValueChange={(value) => dispatch({ type: "UPDATE_FORM", payload: { nationality: value } })}
+            onValueChange={(value) => handleChange("nationality", value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Your Nationality" />
@@ -478,7 +489,6 @@ export default function AdFormStep1() {
             Incall Rates <span className="text-red-500">*</span>
           </Label>
           <RatesTable
-            type="incall"
             rates={state.incallRates}
             onChange={(key, value) => {
               const updatedRates = { ...state.incallRates, [key]: value }
@@ -493,7 +503,6 @@ export default function AdFormStep1() {
             Outcall Rates <span className="text-red-500">*</span>
           </Label>
           <RatesTable
-            type="outcall"
             rates={state.outcallRates}
             onChange={(key, value) => {
               const updatedRates = { ...state.outcallRates, [key]: value }
@@ -572,29 +581,24 @@ function FilterChip({ label, active, onClick }: FilterChipProps) {
 }
 
 interface RatesTableProps {
-  type: "incall" | "outcall"
   rates: Record<string, string>
   onChange: (key: string, value: string) => void
 }
 
-function RatesTable({ type, rates, onChange }: RatesTableProps) {
+function RatesTable({ rates, onChange }: RatesTableProps) {
   const timeOptions = [
     { key: "0.5", label: "0.5 Hour" },
     { key: "1", label: "1 Hour" },
     { key: "2", label: "2 Hours" },
     { key: "3", label: "3 Hours" },
-    { key: "6", label: "6 Hours" },
-    { key: "12", label: "12 Hours" },
-    { key: "24", label: "24 Hours" },
-    { key: "48", label: "48 Hours" },
-    { key: "additional24", label: "Another 24h" },
+    { key: "overnight", label: "Overnight" },
   ]
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+    <div className="border rounded-md overflow-hidden">
       <div className="grid grid-cols-3 bg-primary text-white font-semibold text-center py-3">
         <div>Time</div>
-        <div>{type === "incall" ? "Incall Rates" : "Outcall Rates"}</div>
+        <div>Rates</div>
         <div>Currency</div>
       </div>
       <div className="divide-y divide-gray-200">
