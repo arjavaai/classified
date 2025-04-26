@@ -107,7 +107,7 @@ export default function SearchResultsPage() {
         <Header />
 
         {/* Breadcrumb Navigation */}
-        <div className="breadcrumb text-sm mb-4">
+        <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
           <Link href="/" className="text-gray-600 hover:text-primary">
             Skluva United States
           </Link>
@@ -140,31 +140,30 @@ export default function SearchResultsPage() {
 
         {/* Search Results Listings */}
         {filteredListings.length > 0 ? (
-          <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {filteredListings.map((listing) => (
               <Link href={`/listing/${listing.id}`} key={listing.id} className="block no-underline text-black">
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden flex hover:shadow-md transition-shadow">
+                <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[220px]">
                   <ImageCarousel 
                     images={listing.images || [listing.image]} 
                     photoCount={listing.photoCount}
                   />
-                  <div className="p-4 flex-1">
-                    <div className="text-accent-blue font-bold text-base mb-2">{listing.title}</div>
-                    <p className="text-gray-700 text-sm mb-3 line-clamp-2">{listing.description}</p>
-                    <div className="flex items-center text-sm text-gray-600 mb-2">
-                      <Calendar className="mr-2 text-gray-400 h-4 w-4" />
-                      <span>{listing.age} years</span>
+                  <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="text-accent-blue font-bold text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 leading-tight">{listing.title}</div>
+                      <p className="text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-4 leading-tight sm:leading-normal">{listing.description}</p>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="mr-2 text-gray-400 h-4 w-4" />
-                      <span>{listing.location}</span>
-                      {listing.isTop && (
-                        <span className="ml-2 bg-green-50 text-green-600 px-1.5 py-0.5 rounded text-[11px] font-semibold">
-                          Top
-                        </span>
-                      )}
+                    <div className="mt-auto">
+                      <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                        <Calendar className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                        <span>{listing.age} years</span>
+                      </div>
+                      <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                        <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                        <span>{listing.location}</span>
+                      </div>
+                      <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
                     </div>
-                    <div className="text-green-600 font-semibold text-lg mt-2">${listing.price}</div>
                   </div>
                 </div>
               </Link>

@@ -23,9 +23,10 @@ export default function ImageCarousel({ images, photoCount }: ImageCarouselProps
 
   return (
     <div 
-      className="relative w-[170px] min-w-[170px] h-[200px] listing-image-carousel"
+      className="relative w-[170px] min-w-[170px] h-[220px] listing-image-carousel"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      style={{ minWidth: '170px' }}
     >
       <Swiper
         modules={[Pagination, Navigation]}
