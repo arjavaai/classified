@@ -5,13 +5,20 @@ import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface FilterSectionProps {
-  title: string
-  children: React.ReactNode
-  defaultOpen?: boolean
-  className?: string
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+  selectedCount?: number;
 }
 
-export function FilterSection({ title, children, defaultOpen = true, className }: FilterSectionProps) {
+export function FilterSection({ 
+  title, 
+  children, 
+  defaultOpen = true, 
+  className,
+  selectedCount = 0
+}: FilterSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
 
   return (
@@ -21,7 +28,14 @@ export function FilterSection({ title, children, defaultOpen = true, className }
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <h3 className="font-medium text-left">{title}</h3>
+        <div className="flex items-center">
+          <h3 className="font-medium text-left">{title}</h3>
+          {selectedCount > 0 && (
+            <span className="ml-2 bg-primary text-white text-xs font-medium px-2 py-0.5 rounded-full">
+              {selectedCount}
+            </span>
+          )}
+        </div>
         <ChevronDown
           className={cn("h-4 w-4 text-primary transition-transform", isOpen ? "rotate-180" : "")}
           aria-hidden="true"

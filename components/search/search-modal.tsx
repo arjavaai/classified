@@ -228,7 +228,7 @@ export default function SearchModal() {
             </div>
 
             {/* Ethnicity Filter */}
-            <FilterSection title="Ethnicity">
+            <FilterSection title="Ethnicity" selectedCount={filters.ethnicity.length}>
               <div className="flex flex-wrap gap-2">
                 {ethnicities.map((ethnicity) => (
                   <FilterButton
@@ -245,7 +245,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Nationality Filter */}
-            <FilterSection title="Nationality">
+            <FilterSection title="Nationality" selectedCount={filters.nationality.length}>
               <div className="flex flex-wrap gap-2">
                 {nationalities.map((nationality) => (
                   <FilterButton
@@ -265,7 +265,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Body Type Filter */}
-            <FilterSection title="Body type">
+            <FilterSection title="Body type" selectedCount={filters.bodyType.length}>
               <div className="flex flex-wrap gap-2">
                 {bodyTypes.map((bodyType) => (
                   <FilterButton
@@ -282,7 +282,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Breast Filter */}
-            <FilterSection title="Breast">
+            <FilterSection title="Breast" selectedCount={filters.breastType.length}>
               <div className="flex flex-wrap gap-2">
                 {breastTypes.map((breastType) => (
                   <FilterButton
@@ -299,7 +299,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Hair Filter */}
-            <FilterSection title="Hair">
+            <FilterSection title="Hair" selectedCount={filters.hairColor.length}>
               <div className="flex flex-wrap gap-2">
                 {hairColors.map((hairColor) => (
                   <FilterButton
@@ -316,7 +316,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Age Filter */}
-            <FilterSection title="Age">
+            <FilterSection title="Age" selectedCount={filters.ageRange.length}>
               <div className="flex flex-wrap gap-2">
                 {ageRanges.map((ageRange) => (
                   <FilterButton
@@ -355,7 +355,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Services Filter */}
-            <FilterSection title="Services">
+            <FilterSection title="Services" selectedCount={filters.services.length}>
               <div className="flex flex-wrap gap-2">
                 {services.map((service) => (
                   <FilterButton
@@ -372,7 +372,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Caters To Filter */}
-            <FilterSection title="Caters to">
+            <FilterSection title="Caters to" selectedCount={filters.catersTo.length}>
               <div className="flex flex-wrap gap-2">
                 {catersTo.map((caterTo) => (
                   <FilterButton
@@ -389,7 +389,7 @@ export default function SearchModal() {
             </FilterSection>
 
             {/* Place of Service Filter */}
-            <FilterSection title="Place of service">
+            <FilterSection title="Place of service" selectedCount={filters.placeOfService.length}>
               <div className="flex flex-wrap gap-2">
                 {placesOfService.map((place) => (
                   <FilterButton

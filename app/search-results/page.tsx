@@ -10,6 +10,7 @@ import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import ImageCarousel from "@/components/listing-card/ImageCarousel"
 import { getFilteredListings, EscortListing } from "@/lib/demo-data"
+import { getAdUrl } from "@/lib/route-utils"
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams()
@@ -142,7 +143,7 @@ export default function SearchResultsPage() {
         {filteredListings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {filteredListings.map((listing) => (
-              <Link href={`/listing/${listing.id}`} key={listing.id} className="block no-underline text-black">
+              <Link href={getAdUrl(listing.title, listing.id)} key={listing.id} className="block no-underline text-black">
                 <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[220px]">
                   <ImageCarousel 
                     images={listing.images || [listing.image]} 

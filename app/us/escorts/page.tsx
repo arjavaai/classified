@@ -1,11 +1,10 @@
 import Header from "@/components/header"
-import AboutSection from "@/components/about-section"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import Link from "next/link"
-import { getAllStatesWithCities, getStateUrl, getCityUrl } from "@/lib/route-utils"
+import { getAllStatesWithCities, getStateUrl } from "@/lib/route-utils"
 
-export default function Home() {
+export default function USEscortsPage() {
   const statesWithCities = getAllStatesWithCities();
 
   return (
@@ -13,22 +12,23 @@ export default function Home() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Header />
 
-        {/* United States Escorts Classified Heading */}
-        <h1 className="text-3xl font-bold text-center text-black my-8">United States Escorts Classified</h1>
-
-        {/* US Escorts Main Link */}
-        <div className="text-center mb-8">
-          <Link 
-            href="/us/escorts" 
-            className="inline-block px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-accent-blue/90 transition-colors"
-          >
-            Browse US Escorts
+        {/* Breadcrumb Navigation */}
+        <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
+          <Link href="/" className="text-gray-600 hover:text-primary">
+            Skluva United States
           </Link>
+          <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
+          <span className="text-accent-blue font-medium">US Escorts</span>
         </div>
 
-        {/* States and Cities Navigation */}
+        {/* US Escorts Heading */}
+        <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
+          United States Escorts
+        </h1>
+
+        {/* States Grid */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h2 className="text-2xl font-bold text-black mb-6">Browse Escorts by Location</h2>
+          <h2 className="text-xl font-semibold mb-6">Browse Escorts by State</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {statesWithCities.map((state) => (
@@ -44,7 +44,7 @@ export default function Home() {
                   {state.cities.slice(0, 5).map((city) => (
                     <Link
                       key={city.slug}
-                      href={getCityUrl(state.slug, city.slug)}
+                      href={`${getStateUrl(state.slug)}/${city.slug}`}
                       className="text-sm text-gray-600 hover:text-accent-blue hover:underline"
                     >
                       {city.name}
@@ -64,7 +64,6 @@ export default function Home() {
           </div>
         </div>
 
-        <AboutSection />
         <InfoFooter />
         <SiteFooter />
       </div>
