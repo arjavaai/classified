@@ -12,15 +12,6 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
-// City data for dropdown
-const cityData: Record<string, string[]> = {
-  CA: ["Los Angeles", "San Francisco", "San Diego", "Sacramento", "Beverly Hills"],
-  NY: ["New York City", "Buffalo", "Albany", "Rochester", "Syracuse"],
-  TX: ["Houston", "Austin", "Dallas", "San Antonio", "Fort Worth"],
-  FL: ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale"],
-  IL: ["Chicago", "Springfield", "Aurora", "Naperville", "Rockford"],
-}
-
 // Define the AdFormData type
 interface AdFormData {
   name: string
@@ -48,21 +39,20 @@ interface AdFormData {
 
 export default function AdFormStep1() {
   const { state, dispatch } = useAdCreation()
-  const [cities, setCities] = useState<string[]>([])
-  const [states, setStates] = useState<{name: string; abbreviation: string}[]>([])
+  const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
+  const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([])
 
   // Load states when component mounts
   useEffect(() => {
-    setStates(getStates())
+    setStatesList(getStates())
   }, [])
 
   // Update cities when state changes
   useEffect(() => {
     if (state.state) {
-      const citiesData = getCitiesByStateCode(state.state)
-      setCities(citiesData.map(city => city.name))
+      setCitiesList(getCitiesByStateCode(state.state))
     } else {
-      setCities([])
+      setCitiesList([])
     }
   }, [state.state])
 
@@ -238,13 +228,13 @@ export default function AdFormStep1() {
           {/* State Dropdown */}
           <div className="mb-3">
             <Select value={state.state} onValueChange={handleStateChange}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Select State" />
               </SelectTrigger>
               <SelectContent>
-                {states.map(state => (
-                  <SelectItem key={state.abbreviation} value={state.abbreviation}>
-                    {state.name}
+                {statesList.map(stateItem => (
+                  <SelectItem key={stateItem.abbreviation} value={stateItem.abbreviation}>
+                    {stateItem.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -253,13 +243,13 @@ export default function AdFormStep1() {
           {/* City Dropdown */}
           <div>
             <Select value={state.city} onValueChange={handleCityChange} disabled={!state.state}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Select City" />
               </SelectTrigger>
               <SelectContent>
-                {cities.map((city) => (
-                  <SelectItem key={city} value={city}>
-                    {city}
+                {citiesList.map((city) => (
+                  <SelectItem key={city.slug} value={city.slug}>
+                    {city.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -303,36 +293,24 @@ export default function AdFormStep1() {
         <div>
           <Label className="text-lg mb-2">Ethnicity</Label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <FilterChip
-              label="African"
-              active={state.ethnicity.includes("African")}
-              onClick={() => toggleSelection("ethnicity", "African")}
-            />
-            <FilterChip
-              label="Arab"
-              active={state.ethnicity.includes("Arab")}
-              onClick={() => toggleSelection("ethnicity", "Arab")}
-            />
-            <FilterChip
-              label="Asian"
-              active={state.ethnicity.includes("Asian")}
-              onClick={() => toggleSelection("ethnicity", "Asian")}
-            />
-            <FilterChip
-              label="Caucasian"
-              active={state.ethnicity.includes("Caucasian")}
-              onClick={() => toggleSelection("ethnicity", "Caucasian")}
-            />
-            <FilterChip
-              label="Indian"
-              active={state.ethnicity.includes("Indian")}
-              onClick={() => toggleSelection("ethnicity", "Indian")}
-            />
-            <FilterChip
-              label="Latin"
-              active={state.ethnicity.includes("Latin")}
-              onClick={() => toggleSelection("ethnicity", "Latin")}
-            />
+            {[
+              "Arabian",
+              "Asian",
+              "Ebony",
+              "Caucasian",
+              "Hispanic",
+              "Indian",
+              "Latin",
+              "Mixed race",
+              "Others"
+            ].map((ethnicity) => (
+              <FilterChip
+                key={ethnicity}
+                label={ethnicity}
+                active={state.ethnicity.includes(ethnicity)}
+                onClick={() => toggleSelection("ethnicity", ethnicity)}
+              />
+            ))}
           </div>
         </div>
 
@@ -343,19 +321,16 @@ export default function AdFormStep1() {
             value={state.nationality}
             onValueChange={(value) => handleChange("nationality", value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="Select Your Nationality" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="albanian">Albanian</SelectItem>
+              <SelectItem value="indian">Indian</SelectItem>
+              <SelectItem value="south_african">South African</SelectItem>
+              <SelectItem value="russian">Russian</SelectItem>
+              <SelectItem value="kenyan">Kenyan</SelectItem>
               <SelectItem value="american">American</SelectItem>
-              <SelectItem value="arabic">Arabic</SelectItem>
-              <SelectItem value="argentinian">Argentinian</SelectItem>
-              <SelectItem value="australian">Australian</SelectItem>
-              <SelectItem value="brazilian">Brazilian</SelectItem>
-              <SelectItem value="canadian">Canadian</SelectItem>
-              <SelectItem value="chinese">Chinese</SelectItem>
-              <SelectItem value="colombian">Colombian</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -364,16 +339,19 @@ export default function AdFormStep1() {
         <div>
           <Label className="text-lg mb-2">Body Type</Label>
           <div className="grid grid-cols-2 gap-3">
-            <FilterChip
-              label="Curvy"
-              active={state.bodyType.includes("Curvy")}
-              onClick={() => toggleSelection("bodyType", "Curvy")}
-            />
-            <FilterChip
-              label="Slim"
-              active={state.bodyType.includes("Slim")}
-              onClick={() => toggleSelection("bodyType", "Slim")}
-            />
+            {[
+              "Slender",
+              "Athletic",
+              "Curvy",
+              "BBW"
+            ].map((bodyType) => (
+              <FilterChip
+                key={bodyType}
+                label={bodyType}
+                active={state.bodyType.includes(bodyType)}
+                onClick={() => toggleSelection("bodyType", bodyType)}
+              />
+            ))}
           </div>
         </div>
 
@@ -382,14 +360,14 @@ export default function AdFormStep1() {
           <Label className="text-lg mb-2">Breast</Label>
           <div className="grid grid-cols-2 gap-3">
             <FilterChip
-              label="Busty"
-              active={state.breastType.includes("Busty")}
-              onClick={() => toggleSelection("breastType", "Busty")}
-            />
-            <FilterChip
               label="Natural Boobs"
               active={state.breastType.includes("Natural Boobs")}
               onClick={() => toggleSelection("breastType", "Natural Boobs")}
+            />
+            <FilterChip
+              label="Busty"
+              active={state.breastType.includes("Busty")}
+              onClick={() => toggleSelection("breastType", "Busty")}
             />
           </div>
         </div>
@@ -398,26 +376,20 @@ export default function AdFormStep1() {
         <div>
           <Label className="text-lg mb-2">Hair</Label>
           <div className="grid grid-cols-2 gap-3">
-            <FilterChip
-              label="Black Hair"
-              active={state.hairColor.includes("Black Hair")}
-              onClick={() => toggleSelection("hairColor", "Black Hair")}
-            />
-            <FilterChip
-              label="Blond Hair"
-              active={state.hairColor.includes("Blond Hair")}
-              onClick={() => toggleSelection("hairColor", "Blond Hair")}
-            />
-            <FilterChip
-              label="Brown Hair"
-              active={state.hairColor.includes("Brown Hair")}
-              onClick={() => toggleSelection("hairColor", "Brown Hair")}
-            />
-            <FilterChip
-              label="Red Hair"
-              active={state.hairColor.includes("Red Hair")}
-              onClick={() => toggleSelection("hairColor", "Red Hair")}
-            />
+            {[
+              "Blond Hair",
+              "Brown Hair",
+              "Black Hair",
+              "Red Hair",
+              "Others"
+            ].map((hairColor) => (
+              <FilterChip
+                key={hairColor}
+                label={hairColor}
+                active={state.hairColor.includes(hairColor)}
+                onClick={() => toggleSelection("hairColor", hairColor)}
+              />
+            ))}
           </div>
         </div>
 
@@ -426,22 +398,20 @@ export default function AdFormStep1() {
           <Label className="text-lg mb-2">Services</Label>
           <div className="grid grid-cols-2 gap-3">
             {[
+              "Oral",
               "Anal",
               "BDSM",
+              "Girlfriend experience",
+              "Porn activities",
               "Body ejaculation",
-              "Dinner dates",
               "Erotic massage",
+              "Tantric massage",
               "Fetish",
               "French kiss",
-              "Girlfriend experience",
-              "Oral",
-              "Porn actresses",
-              "Role playing",
-              "Sexting",
-              "Tantric massage",
+              "Role play",
               "Threesome",
-              "Travel companion",
-              "Videocall",
+              "Sexting",
+              "Videocall"
             ].map((service) => (
               <FilterChip
                 key={service}
@@ -457,7 +427,12 @@ export default function AdFormStep1() {
         <div>
           <Label className="text-lg mb-2">Caters to</Label>
           <div className="grid grid-cols-2 gap-3">
-            {["Couples", "Disabled", "Men", "Women"].map((option) => (
+            {[
+              "Men",
+              "Women",
+              "Non-binary",
+              "Couples"
+            ].map((option) => (
               <FilterChip
                 key={option}
                 label={option}
@@ -472,7 +447,14 @@ export default function AdFormStep1() {
         <div>
           <Label className="text-lg mb-2">Place of services</Label>
           <div className="grid grid-cols-2 gap-3">
-            {["At home", "Clubs", "Events and parties", "Hotels", "Incall", "Outcall"].map((place) => (
+            {[
+              "At home",
+              "Events and parties",
+              "Hotel / Motel",
+              "Clubs",
+              "Incall",
+              "Outcall"
+            ].map((place) => (
               <FilterChip
                 key={place}
                 label={place}

@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 
 export default function AdFormStep3() {
   const { state, dispatch } = useAdCreation()
@@ -82,18 +83,7 @@ export default function AdFormStep3() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 text-gray-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <span className="text-gray-500 font-medium">Your Images</span>
                 </div>
               )}
               <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded text-xs flex items-center">
@@ -150,7 +140,7 @@ export default function AdFormStep3() {
                 <span>{state.city && state.state ? `${state.city}, ${state.state}` : "Location"}</span>
               </div>
               <div className="absolute top-3 md:top-4 right-3 md:right-4 bg-green-500 text-white px-2 py-1 rounded text-xs md:text-sm font-semibold">
-                €{oneHourRate}
+                $$
               </div>
             </div>
           </div>
@@ -159,19 +149,23 @@ export default function AdFormStep3() {
 
       {/* Terms and Conditions */}
       <div className="mb-12">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="flex items-center justify-center w-16 h-8 bg-primary text-white rounded-full">Yes</div>
-          <div className="flex items-start space-x-2">
-            <Checkbox id="terms" checked={state.termsAccepted} onCheckedChange={handleTermsChange} className="mt-1" />
-            <Label htmlFor="terms" className="text-gray-600 text-lg">
+        <div className="flex flex-row items-start gap-4 mb-6">
+          <div className="flex items-center gap-2 min-w-[120px] justify-center">
+            <span className="text-gray-700 font-medium text-sm">No</span>
+            <Switch
+              checked={state.termsAccepted}
+              onCheckedChange={handleTermsChange}
+              id="terms-switch"
+              className="mx-2 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300"
+            />
+            <span className="text-primary font-medium text-sm">Yes</span>
+          </div>
+          <div className="flex-1 mt-1">
+            <Label htmlFor="terms-switch" className="text-gray-600 text-xs cursor-pointer leading-snug">
               I have read the{" "}
-              <a href="#" className="text-primary">
-                Terms and Conditions
-              </a>{" "}
+              <a href="#" className="text-primary">Terms and Conditions</a>{" "}
               of use and{" "}
-              <a href="#" className="text-primary">
-                Privacy Policy
-              </a>{" "}
+              <a href="#" className="text-primary">Privacy Policy</a>{" "}
               and I hereby authorize the processing of my personal data for the purpose of providing this web service.
             </Label>
           </div>

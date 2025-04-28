@@ -260,31 +260,6 @@ export default function Header() {
                         <Twitter className="mr-3 h-5 w-5" />
                         <span className="text-lg">Twitter</span>
                       </Link>
-                      <Link href="#" className="flex items-center hover:text-primary p-2">
-                        <Instagram className="mr-3 h-5 w-5" />
-                        <span className="text-lg">Instagram</span>
-                      </Link>
-                      <Link href="#" className="flex items-center hover:text-primary p-2">
-                        <div className="mr-3 h-5 w-5">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M17 2h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
-                            <path d="M7 2H3a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
-                            <path d="M17 12h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Z" />
-                            <path d="M7 12H3a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Z" />
-                          </svg>
-                        </div>
-                        <span className="text-lg">Tumblr</span>
-                      </Link>
                     </div>
                   </div>
                 </div>

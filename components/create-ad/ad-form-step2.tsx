@@ -5,12 +5,12 @@ import type React from "react"
 import { useAdCreation } from "./ad-creation-context"
 import { Button } from "@/components/ui/button"
 import { useRef, useState } from "react"
-import { Trash2, Upload } from "lucide-react"
+import { Trash2, Upload, CheckCircle } from "lucide-react"
 
 export default function AdFormStep2() {
   const { state, dispatch } = useAdCreation()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+  const [uploadingPhotos, setUploadingPhotos] = useState<{ url: string; progress: number }[]>([])
   const [dragActive, setDragActive] = useState(false)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,50 +42,41 @@ export default function AdFormStep2() {
   }
 
   const handleFiles = (files: File[]) => {
-    // Filter for images only
     const imageFiles = files.filter((file) => file.type.startsWith("image/"))
-
-    // Limit to remaining slots (max 10 photos)
-    const remainingSlots = 10 - state.photos.length
+    const remainingSlots = 10 - state.photos.length - uploadingPhotos.length
     const filesToProcess = imageFiles.slice(0, remainingSlots)
-
     if (filesToProcess.length === 0) {
       if (imageFiles.length > 0 && remainingSlots === 0) {
         alert("Maximum number of photos (10) reached")
       }
       return
     }
-
-    // Process each file
     filesToProcess.forEach((file) => {
-      // Show progress
-      setUploadProgress(0)
-
+      const tempUrl = URL.createObjectURL(file)
+      setUploadingPhotos((prev) => [...prev, { url: tempUrl, progress: 0 }])
       // Simulate upload progress
+      let progress = 0
       const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev === null) return 0
-          const newProgress = prev + 10
-          if (newProgress >= 100) {
-            clearInterval(interval)
-            setTimeout(() => setUploadProgress(null), 500)
-            return 100
+        progress += 10
+        setUploadingPhotos((prev) =>
+          prev.map((item) =>
+            item.url === tempUrl ? { ...item, progress: Math.min(progress, 100) } : item
+          )
+        )
+        if (progress >= 100) {
+          clearInterval(interval)
+          // Read file as data URL
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            if (e.target?.result) {
+              dispatch({ type: "ADD_PHOTO", payload: e.target.result.toString() })
+              setUploadingPhotos((prev) => prev.filter((item) => item.url !== tempUrl))
+              URL.revokeObjectURL(tempUrl)
+            }
           }
-          return newProgress
-        })
-      }, 100)
-
-      // Read file as data URL
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          dispatch({
-            type: "ADD_PHOTO",
-            payload: e.target.result.toString(),
-          })
+          reader.readAsDataURL(file)
         }
-      }
-      reader.readAsDataURL(file)
+      }, 100)
     })
   }
 
@@ -113,9 +104,9 @@ export default function AdFormStep2() {
 
       {/* Drop Area */}
       <div
-        className={`border-2 border-dashed rounded-lg p-12 text-center mb-8 cursor-pointer transition-colors ${
-          dragActive ? "border-primary bg-blue-50" : "border-gray-200 hover:border-primary hover:bg-blue-50"
-        }`}
+        className={
+          "border-2 border-dashed rounded-lg p-12 text-center mb-8 cursor-pointer transition-colors border-primary bg-blue-50"
+        }
         onClick={() => fileInputRef.current?.click()}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -135,27 +126,41 @@ export default function AdFormStep2() {
         />
       </div>
 
-      {/* Upload Progress */}
-      {uploadProgress !== null && (
-        <div className="mb-6">
-          <div className="flex justify-between mb-1">
-            <span className="text-sm text-gray-600">Uploading...</span>
-            <span className="text-sm text-gray-600">{uploadProgress}%</span>
-          </div>
-          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-300"
-              style={{ width: `${uploadProgress}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
-
       {/* Photo Preview Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
+        {/* Uploading images with progress */}
+        {uploadingPhotos.map((item, idx) => (
+          <div key={item.url} className="relative aspect-square rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+            <img src={item.url} alt="Uploading" className="w-full h-full object-cover opacity-60" />
+            {/* Progress overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-40">
+              <svg className="w-12 h-12 mb-2" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="16" fill="none" stroke="#3b82f6" strokeWidth="4" opacity="0.2" />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="4"
+                  strokeDasharray={100}
+                  strokeDashoffset={100 - item.progress}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="text-white font-semibold">{item.progress}%</span>
+            </div>
+          </div>
+        ))}
+        {/* Uploaded images with tick */}
         {state.photos.map((photo, index) => (
           <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
             <img src={photo || "/placeholder.svg"} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+            {/* Tick overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <CheckCircle className="w-14 h-14 text-primary bg-white rounded-full shadow-lg opacity-60" />
+            </div>
+            {/* Remove button on hover */}
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Button
                 variant="destructive"

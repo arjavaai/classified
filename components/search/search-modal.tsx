@@ -13,7 +13,7 @@ import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // Filter options data
 const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
-const nationalities = ["is Indian", "is South African", "is Russian", "is Kenyan"]
+const nationalities = ["Indian", "is South African", "is Russian", "is Kenyan"]
 const bodyTypes = ["Slender", "Athletic", "Curvy", "BBW"]
 const breastTypes = ["Natural Boobs", "Busty"]
 const hairColors = ["Blond Hair", "Brown Hair", "Black Hair", "Red Hair", "Others"]

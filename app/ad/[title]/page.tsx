@@ -484,11 +484,16 @@ export default function AdPage({ params }: { params: { title: string } }) {
           {/* Back Button */}
           <button 
             onClick={handleBackClick} 
-            className="flex items-center text-gray-600 hover:text-primary mb-6"
+            className="flex items-center text-gray-600 hover:text-primary mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to search
           </button>
+          
+          {/* Ad Title */}
+          <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
+            {listing.title}
+          </h1>
         </div>
       </div>
       

@@ -255,7 +255,7 @@ export default function SignupForm() {
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${passwordValidation.hasUpperLower ? 'text-green-500' : 'text-gray-300'} mr-3`}
+                  className={`h-6 w-6 ${passwordValidation.hasUpperLower ? 'text-green-500' : 'text-gray-300'} mr-3`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -272,7 +272,7 @@ export default function SignupForm() {
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${passwordValidation.hasNumber ? 'text-green-500' : 'text-gray-300'} mr-3`}
+                  className={`h-6 w-6 ${passwordValidation.hasNumber ? 'text-green-500' : 'text-gray-300'} mr-3`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -289,7 +289,7 @@ export default function SignupForm() {
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${passwordValidation.hasSpecial ? 'text-green-500' : 'text-gray-300'} mr-3`}
+                  className={`h-6 w-6 ${passwordValidation.hasSpecial ? 'text-green-500' : 'text-gray-300'} mr-3`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -306,7 +306,7 @@ export default function SignupForm() {
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${passwordValidation.hasMinLength ? 'text-green-500' : 'text-gray-300'} mr-3`}
+                  className={`h-6 w-6 ${passwordValidation.hasMinLength ? 'text-green-500' : 'text-gray-300'} mr-3`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"

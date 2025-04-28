@@ -27,8 +27,9 @@ function AdFormContent() {
       ) : (
         <>
           {/* Blue Header */}
-          <header className="bg-primary text-white py-8 -mx-4 px-4 mb-8 text-center rounded-xl">
-            <h1 className="text-4xl font-bold">Publish post in just a few steps!</h1>
+          <header className="bg-primary text-white py-5 sm:py-8 px-4 mb-8 text-center rounded-xl max-w-xl mx-auto">
+            <h1 className="text-2xl sm:text-4xl font-bold">Post Your Ad</h1>
+            <p className="mt-2 text-sm sm:text-base">Quick and easy in just a few steps</p>
           </header>
 
           {/* Steps Progress Bar */}
