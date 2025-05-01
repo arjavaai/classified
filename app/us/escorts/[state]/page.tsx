@@ -49,9 +49,14 @@ export default function StatePage({ params }: { params: { state: string } }) {
 
   return (
     <div className="bg-gray-100">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <Header />
+        </div>
+      </div>
+      
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <Header />
-
         {/* Breadcrumb Navigation */}
         <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
           <Link href="/" className="text-gray-600 hover:text-primary">
@@ -115,10 +120,10 @@ export default function StatePage({ params }: { params: { state: string } }) {
             </p>
           </div>
         )}
-
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 }

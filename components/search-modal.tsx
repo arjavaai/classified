@@ -194,17 +194,13 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
       <div className="p-4">
         {/* Category and Location Dropdowns */}
         <div className="mb-4">
-          <div className="border border-gray-200 rounded p-2 mb-2 bg-gray-50">
-            <span className="text-gray-700">Escorts</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select
-              className="border border-gray-200 rounded p-2 w-full"
+              className="border border-gray-200 rounded-md p-3 w-full h-12"
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
             >
-              <option value="">States</option>
+              <option value="">All Regions</option>
               {statesList.map((state) => (
                 <option key={state.abbreviation} value={state.abbreviation}>
                   {state.name}
@@ -213,12 +209,12 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
             </select>
 
             <select
-              className="border border-gray-200 rounded p-2 w-full"
+              className="border border-gray-200 rounded-md p-3 w-full h-12"
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
               disabled={!selectedState}
             >
-              <option value="">All the cities</option>
+              <option value="">Cities {!selectedState ? "not available" : ""}</option>
               {cities.map((city) => (
                 <option key={city.slug} value={city.slug}>
                   {city.name}
@@ -229,10 +225,10 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
 
           <Input
             type="text"
-            placeholder="Search here..."
+            placeholder="Search Here..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="w-full mt-2 mb-4"
+            className="w-full mt-4 mb-4 h-12 rounded-md p-3"
           />
         </div>
 

@@ -19,40 +19,26 @@ export default function SearchForm() {
 
   return (
     <>
-      <form onSubmit={handleSearch} className="mt-4 relative flex items-center">
-        <div className="flex-grow relative">
-          <div className="absolute left-3 top-3 text-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
+      <form onSubmit={handleSearch} className="flex items-center w-full">
+        <div className="bg-white rounded-lg shadow-sm flex items-center w-full">
+          <div className="flex-1 flex items-center pl-6 py-1">
+            <Search className="h-6 w-6 text-black mr-3" />
+            <input
+              type="text"
+              placeholder="Search by City"
+              className="w-full py-4 border-none focus:outline-none text-base text-black font-medium"
+              value={filters.searchText}
+              onChange={(e) => dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value })}
+              onClick={openModal}
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search By City"
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm text-black"
-            value={filters.searchText}
-            onChange={(e) => dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value })}
-            onClick={openModal}
-          />
+          <button
+            type="submit"
+            className="bg-[#007bff] hover:bg-blue-600 text-white px-8 py-2.5 rounded-[4px] font-medium text-base h-[60%] self-center mr-3 border border-blue-600 my-4"
+          >
+            Search
+          </button>
         </div>
-        <button
-          type="submit"
-          className="ml-2 bg-primary text-white p-3 rounded-full flex items-center justify-center"
-          aria-label="Search"
-        >
-          <Search className="h-4 w-4" />
-        </button>
       </form>
 
       <SearchModal />

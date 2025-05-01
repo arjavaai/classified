@@ -33,56 +33,54 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-8 md:py-12 min-h-[calc(100vh-340px)] flex flex-col justify-center">
-      <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Reset Password</h1>
+    <div className="max-w-md mx-auto px-6 py-8 md:py-12 min-h-[calc(100vh-340px)] flex flex-col justify-center bg-white">
+      <h1 className="text-2xl font-bold text-center mb-8 text-black">Reset Password</h1>
 
-        {isSuccess ? (
-          <div className="text-center">
-            <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-6">
-              <p>Password reset email sent!</p>
-              <p className="mt-2">Please check your email for reset instructions.</p>
-            </div>
-            <Link href="/login" className="text-primary font-semibold">
-              Return to Login
+      {isSuccess ? (
+        <div className="text-center">
+          <div className="bg-green-50 text-green-700 p-4 rounded border border-green-200 mb-6">
+            <p className="font-bold">Password reset email sent!</p>
+            <p className="mt-2">Please check your email for reset instructions.</p>
+          </div>
+          <Link href="/login" className="text-[#007bff] font-bold text-base">
+            Return to Login
+          </Link>
+        </div>
+      ) : (
+        <form className="space-y-6" onSubmit={handleResetPassword}>
+          {/* Email Field */}
+          <div>
+            <label htmlFor="email" className="block text-base font-bold mb-2 text-black">
+              Email
+            </label>
+            <Input 
+              type="email" 
+              id="email" 
+              placeholder="Enter your email" 
+              className="w-full p-4 text-base rounded border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 h-14"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Reset Button */}
+          <Button
+            type="submit"
+            className="w-full bg-[#007bff] text-white font-medium rounded-[4px] px-12 py-4 hover:bg-blue-700 border border-blue-600"
+            disabled={isLoading}
+          >
+            {isLoading ? "Sending..." : "Reset Password"}
+          </Button>
+
+          {/* Back to Login */}
+          <div className="text-center mt-4">
+            <Link href="/login" className="text-[#007bff] font-bold text-base">
+              Back to Login
             </Link>
           </div>
-        ) : (
-          <form className="space-y-6" onSubmit={handleResetPassword}>
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-lg font-medium mb-2">
-                Email
-              </label>
-              <Input 
-                type="email" 
-                id="email" 
-                placeholder="Enter your email" 
-                className="input-field w-full p-4 text-base rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Reset Button */}
-            <Button
-              type="submit"
-              className="w-full bg-primary text-white font-semibold py-5 px-4 rounded-lg hover:bg-primary-light transition text-lg"
-              disabled={isLoading}
-            >
-              {isLoading ? "Sending..." : "Reset Password"}
-            </Button>
-
-            {/* Back to Login */}
-            <div className="text-center mt-4">
-              <Link href="/login" className="text-primary font-semibold">
-                Back to Login
-              </Link>
-            </div>
-          </form>
-        )}
-      </div>
+        </form>
+      )}
     </div>
   )
 } 

@@ -48,10 +48,13 @@ export default function CityPage({ params }: { params: { state: string; city: st
   }, [params.state, params.city])
 
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
-
+      </div>
+      
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Breadcrumb Navigation */}
         <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
           <Link href="/" className="text-gray-600 hover:text-primary">
@@ -119,10 +122,10 @@ export default function CityPage({ params }: { params: { state: string; city: st
             </p>
           </div>
         )}
-
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 }

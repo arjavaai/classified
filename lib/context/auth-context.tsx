@@ -37,6 +37,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     console.log("Auth context initializing...")
+    
+    // Skip auth state monitoring if auth is null (happens during SSR)
+    if (!auth) {
+      console.log("Auth is not initialized, skipping auth state monitoring")
+      setLoading(false)
+      return () => {}
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       console.log("Auth state changed:", authUser ? `User ${authUser.email} logged in` : "No user")
       setUser(authUser)
@@ -47,6 +55,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [])
 
   const signOut = async () => {
+    if (!auth) {
+      console.error("Auth not initialized")
+      return
+    }
+    
     try {
       await firebaseSignOut(auth)
       setUser(null)
@@ -58,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Function to refresh user data and return the updated user
   const refreshUser = async (): Promise<User | null> => {
-    if (user) {
+    if (user && auth) {
       try {
         console.log("Refreshing user data...")
         await reload(user)
@@ -79,4 +92,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-} 
+}

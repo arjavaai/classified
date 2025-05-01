@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signUp, signIn, resetPassword, logOut, auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,22 @@ export default function AuthTestPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Use useEffect to handle client-side only code
+  useEffect(() => {
+    setIsClient(true);
+    // Set up a listener for auth state changes
+    if (auth) {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        setCurrentUser(user);
+      });
+      
+      // Clean up the listener
+      return () => unsubscribe();
+    }
+  }, []);
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -162,12 +178,14 @@ export default function AuthTestPage() {
           <p className={status.includes("successful") ? "text-green-600" : "text-red-600"}>{status || "No action taken yet"}</p>
         </div>
 
-        <div className="mt-6 text-sm text-gray-500">
-          <p>Current auth state:</p>
-          <p>{auth.currentUser ? `Logged in as ${auth.currentUser.email}` : "Not logged in"}</p>
-          <p>Email verified: {auth.currentUser?.emailVerified ? "Yes" : "No"}</p>
-        </div>
+        {isClient && (
+          <div className="mt-6 text-sm text-gray-500">
+            <p>Current auth state:</p>
+            <p>{currentUser ? `Logged in as ${currentUser.email}` : "Not logged in"}</p>
+            <p>Email verified: {currentUser?.emailVerified ? "Yes" : "No"}</p>
+          </div>
+        )}
       </div>
     </div>
   );
-} 
+}

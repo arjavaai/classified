@@ -5,13 +5,18 @@ import SignupForm from "@/components/auth/signup-form"
 
 export default function SignupPage() {
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
-        <SignupForm />
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <SignupForm />
+      </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 }

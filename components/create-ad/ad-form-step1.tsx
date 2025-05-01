@@ -12,6 +12,44 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
+// Import nationality data from search modal
+const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
+const allNationalities = [
+  "Albanian", "American", "Arabic", "Argentinian", "Australian", "Austrian", 
+  "Bangladeshi", "Belgian", "Bolivian", "Bosnian", "Brazilian", "Bulgarian", 
+  "Canadian", "Chilean", "Chinese", "Colombian", "Costa Rican", "Croatian", 
+  "Cuban", "Czech", "Danisn", "Dominican", "Dutch", "Ecuadorian", "English", 
+  "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Guatemalan", 
+  "Haitian", "Honduran", "Hungarian", "Indian", "Indonesian", "Irish", "Italian", 
+  "Jamaican", "Japanese", "Kenyan", "Letvian", "Lithuanian", "Malaysian", 
+  "Maldivian", "Mexican", "Moldovan", "Moroccan", "NewZealander", "Nicaraguan", 
+  "Nigerian", "Norwegian", "Pakistani", "Panamanian", "Paraguayan", "Peruvian", 
+  "Polish", "Portuguese", "Romanian", "Russian", "Senegalese", "Serbian", 
+  "Singaporean", "South African", "Spanish", "Swedish", "Swiss", "Thai", 
+  "Tunisian", "Turkish", "Ukrainian", "Uruguayan", "Venezuelan", "Vietnamese"
+]
+const bodyTypes = ["Slender", "Athletic", "Curvy", "BBW"]
+const breastTypes = ["Natural Boobs", "Busty"]
+const hairColors = ["Blond Hair", "Brown Hair", "Black Hair", "Red Hair", "Others"]
+const ageRanges = ["18-19", "20s", "30s", "40s", "50s", "60+"]
+const services = [
+  "Oral",
+  "Anal",
+  "BDSM",
+  "Girlfriend experience",
+  "Porn activities",
+  "Body ejaculation",
+  "Erotic massage",
+  "Tantric massage",
+  "Fetish",
+  "French kiss",
+  "Role play",
+  "Threesome",
+  "Sexting",
+  "Videocall",
+]
+const catersTo = ["Men", "Women", "Non-binary", "Couples"]
+
 // Define the AdFormData type
 interface AdFormData {
   name: string
@@ -26,7 +64,7 @@ interface AdFormData {
   phone: string
   whatsapp: boolean
   ethnicity: string[]
-  nationality: string
+  nationality: string[]
   bodyType: string[]
   breastType: string[]
   hairColor: string[]
@@ -79,15 +117,20 @@ export default function AdFormStep1() {
   const toggleSelection = (
     field: keyof Pick<
       AdFormData,
-      "ethnicity" | "bodyType" | "breastType" | "hairColor" | "services" | "catersTo" | "placeOfService"
+      "ethnicity" | "bodyType" | "breastType" | "hairColor" | "services" | "catersTo" | "placeOfService" | "nationality"
     >,
     value: string,
   ) => {
-    handleChange(field, value)
+    const currentValues = state[field] as string[];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(item => item !== value)
+      : [...currentValues, value];
+    
+    handleChange(field, newValues);
   }
 
   const goToNextStep = () => {
-    // Basic validation
+    // Basic validation - only validate required fields
     if (!state.name || !state.age || !state.title || !state.description || !state.state || !state.city) {
       alert("Please fill in all required fields")
       return
@@ -102,46 +145,43 @@ export default function AdFormStep1() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        {/* Name Field */}
-        <div>
-          <Label htmlFor="name" className="text-lg mb-2">
-            Name <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="text"
-            id="name"
-            name="name"
-            value={state.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            placeholder="Enter Name"
-            className="p-4 text-base"
-          />
-        </div>
+        {/* Two-column layout for basic info on desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name Field */}
+          <div>
+            <Label htmlFor="name" className="text-lg mb-2">
+              Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              value={state.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              placeholder="Enter Name"
+              className="p-4 text-base"
+            />
+          </div>
 
-        {/* Category Field (Fixed) */}
-        <div>
-          <Label className="text-lg mb-2">Category</Label>
-          <Input type="text" value={state.category} disabled className="p-4 text-base bg-gray-50 cursor-not-allowed" />
-        </div>
-
-        {/* Age Field */}
-        <div>
-          <Label htmlFor="age" className="text-lg mb-2">
-            Age <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="number"
-            id="age"
-            name="age"
-            value={state.age}
-            onChange={(e) => handleChange("age", e.target.value)}
-            min="18"
-            max="99"
-            placeholder="Enter Age"
-            className="p-4 text-base"
-          />
+          {/* Age Field */}
+          <div>
+            <Label htmlFor="age" className="text-lg mb-2">
+              Age <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="number"
+              id="age"
+              name="age"
+              value={state.age}
+              onChange={(e) => handleChange("age", e.target.value)}
+              min="18"
+              max="99"
+              placeholder="Enter Age"
+              className="p-4 text-base"
+            />
+          </div>
         </div>
 
         {/* Contact Preference Field */}
@@ -149,7 +189,7 @@ export default function AdFormStep1() {
           <Label className="text-lg mb-2">
             How would you like to be connected? <span className="text-red-500">*</span>
           </Label>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <ContactOption
               id="email-only"
               value="email"
@@ -174,65 +214,88 @@ export default function AdFormStep1() {
           </div>
         </div>
 
-        {/* Email Field */}
-        {(state.contactPreference === "email" || state.contactPreference === "both") && (
-          <div>
-            <Label htmlFor="email" className="text-lg mb-2">
-              Email <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="email"
-              id="email"
-              name="email"
-              value={state.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              placeholder="Enter Email"
-              className="p-4 text-base"
-            />
-          </div>
-        )}
+        {/* Two-column layout for contact info on desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Email Field */}
+          {(state.contactPreference === "email" || state.contactPreference === "both") && (
+            <div>
+              <Label htmlFor="email" className="text-lg mb-2">
+                Email <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                value={state.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                placeholder="Enter Email"
+                className="p-4 text-base"
+              />
+            </div>
+          )}
 
-        {/* Phone Field */}
-        {(state.contactPreference === "phone" || state.contactPreference === "both") && (
-          <div>
-            <Label htmlFor="phone" className="text-lg mb-2">
-              Phone <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={state.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              placeholder="Enter Phone Number"
-              className="p-4 text-base"
-            />
-          </div>
-        )}
-
-        {/* WhatsApp Option */}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="whatsapp"
-            checked={state.whatsapp}
-            onCheckedChange={(checked) => handleChange("whatsapp", !!checked)}
-          />
-          <Label htmlFor="whatsapp">Available on WhatsApp</Label>
+          {/* Phone Field */}
+          {(state.contactPreference === "phone" || state.contactPreference === "both") && (
+            <div>
+              <Label htmlFor="phone" className="text-lg mb-2">
+                Phone <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={state.phone}
+                onChange={(e) => handleChange("phone", e.target.value)}
+                placeholder="Enter Phone Number"
+                className="p-4 text-base"
+              />
+            </div>
+          )}
         </div>
 
-        {/* Location Fields */}
-        <div>
-          <Label className="text-lg mb-2">
-            Location <span className="text-red-500">*</span>
-          </Label>
-          {/* State Dropdown */}
-          <div className="mb-3">
-            <Select value={state.state} onValueChange={handleStateChange}>
-              <SelectTrigger className="bg-white">
+        {/* WhatsApp Option - Only visible when phone is selected */}
+        {(state.contactPreference === "phone" || state.contactPreference === "both") && (
+          <div className="flex items-center space-x-4">
+            <Label className="text-lg">WhatsApp</Label>
+            <div 
+              className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors cursor-pointer ${
+                state.whatsapp 
+                  ? "bg-[#007bff]" 
+                  : "bg-gray-200 border border-[#007bff]"
+              }`}
+              onClick={() => handleChange("whatsapp", !state.whatsapp)}
+            >
+              <span
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform shadow-sm ${
+                  state.whatsapp ? "translate-x-8" : "translate-x-0"
+                }`}
+              >
+                {state.whatsapp ? (
+                  <span className="text-[#007bff] text-xs font-medium">Yes</span>
+                ) : (
+                  <span className="text-gray-500 text-xs font-medium">No</span>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Two-column layout for location on desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* State Field */}
+          <div>
+            <Label htmlFor="state" className="text-lg mb-2">
+              State <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={state.state}
+              onValueChange={handleStateChange}
+            >
+              <SelectTrigger id="state" className="p-4 text-base">
                 <SelectValue placeholder="Select State" />
               </SelectTrigger>
               <SelectContent>
-                {statesList.map(stateItem => (
+                {statesList.map((stateItem) => (
                   <SelectItem key={stateItem.abbreviation} value={stateItem.abbreviation}>
                     {stateItem.name}
                   </SelectItem>
@@ -240,11 +303,19 @@ export default function AdFormStep1() {
               </SelectContent>
             </Select>
           </div>
-          {/* City Dropdown */}
+
+          {/* City Field */}
           <div>
-            <Select value={state.city} onValueChange={handleCityChange} disabled={!state.state}>
-              <SelectTrigger className="bg-white">
-                <SelectValue placeholder="Select City" />
+            <Label htmlFor="city" className="text-lg mb-2">
+              City <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={state.city}
+              onValueChange={handleCityChange}
+              disabled={!state.state}
+            >
+              <SelectTrigger id="city" className="p-4 text-base">
+                <SelectValue placeholder={state.state ? "Select City" : "Select State First"} />
               </SelectTrigger>
               <SelectContent>
                 {citiesList.map((city) => (
@@ -289,21 +360,30 @@ export default function AdFormStep1() {
           />
         </div>
 
+        {/* Nationality Field */}
+        <div>
+          <Label className="text-lg mb-2">
+            Nationality
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {allNationalities.map((nationality) => (
+              <FilterChip
+                key={nationality}
+                label={nationality}
+                active={state.nationality.includes(nationality)}
+                onClick={() => toggleSelection("nationality", nationality)}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Ethnicity Field */}
         <div>
-          <Label className="text-lg mb-2">Ethnicity</Label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              "Arabian",
-              "Asian",
-              "Ebony",
-              "Caucasian",
-              "Hispanic",
-              "Indian",
-              "Latin",
-              "Mixed race",
-              "Others"
-            ].map((ethnicity) => (
+          <Label className="text-lg mb-2">
+            Ethnicity
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {ethnicities.map((ethnicity) => (
               <FilterChip
                 key={ethnicity}
                 label={ethnicity}
@@ -314,37 +394,13 @@ export default function AdFormStep1() {
           </div>
         </div>
 
-        {/* Nationality Field */}
-        <div>
-          <Label className="text-lg mb-2">Nationality</Label>
-          <Select
-            value={state.nationality}
-            onValueChange={(value) => handleChange("nationality", value)}
-          >
-            <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Select Your Nationality" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="indian">Indian</SelectItem>
-              <SelectItem value="south_african">South African</SelectItem>
-              <SelectItem value="russian">Russian</SelectItem>
-              <SelectItem value="kenyan">Kenyan</SelectItem>
-              <SelectItem value="american">American</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Body Type Field */}
         <div>
-          <Label className="text-lg mb-2">Body Type</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              "Slender",
-              "Athletic",
-              "Curvy",
-              "BBW"
-            ].map((bodyType) => (
+          <Label className="text-lg mb-2">
+            Body Type
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {bodyTypes.map((bodyType) => (
               <FilterChip
                 key={bodyType}
                 label={bodyType}
@@ -357,32 +413,28 @@ export default function AdFormStep1() {
 
         {/* Breast Type Field */}
         <div>
-          <Label className="text-lg mb-2">Breast</Label>
-          <div className="grid grid-cols-2 gap-3">
-            <FilterChip
-              label="Natural Boobs"
-              active={state.breastType.includes("Natural Boobs")}
-              onClick={() => toggleSelection("breastType", "Natural Boobs")}
-            />
-            <FilterChip
-              label="Busty"
-              active={state.breastType.includes("Busty")}
-              onClick={() => toggleSelection("breastType", "Busty")}
-            />
+          <Label className="text-lg mb-2">
+            Breast
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {breastTypes.map((breastType) => (
+              <FilterChip
+                key={breastType}
+                label={breastType}
+                active={state.breastType.includes(breastType)}
+                onClick={() => toggleSelection("breastType", breastType)}
+              />
+            ))}
           </div>
         </div>
 
         {/* Hair Color Field */}
         <div>
-          <Label className="text-lg mb-2">Hair</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              "Blond Hair",
-              "Brown Hair",
-              "Black Hair",
-              "Red Hair",
-              "Others"
-            ].map((hairColor) => (
+          <Label className="text-lg mb-2">
+            Hair
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {hairColors.map((hairColor) => (
               <FilterChip
                 key={hairColor}
                 label={hairColor}
@@ -395,24 +447,11 @@ export default function AdFormStep1() {
 
         {/* Services Field */}
         <div>
-          <Label className="text-lg mb-2">Services</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              "Oral",
-              "Anal",
-              "BDSM",
-              "Girlfriend experience",
-              "Porn activities",
-              "Body ejaculation",
-              "Erotic massage",
-              "Tantric massage",
-              "Fetish",
-              "French kiss",
-              "Role play",
-              "Threesome",
-              "Sexting",
-              "Videocall"
-            ].map((service) => (
+          <Label className="text-lg mb-2">
+            Services
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {services.map((service) => (
               <FilterChip
                 key={service}
                 label={service}
@@ -425,14 +464,11 @@ export default function AdFormStep1() {
 
         {/* Caters To Field */}
         <div>
-          <Label className="text-lg mb-2">Caters to</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              "Men",
-              "Women",
-              "Non-binary",
-              "Couples"
-            ].map((option) => (
+          <Label className="text-lg mb-2">
+            Caters to
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {catersTo.map((option) => (
               <FilterChip
                 key={option}
                 label={option}
@@ -445,16 +481,11 @@ export default function AdFormStep1() {
 
         {/* Place of Services Field */}
         <div>
-          <Label className="text-lg mb-2">Place of services</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              "At home",
-              "Events and parties",
-              "Hotel / Motel",
-              "Clubs",
-              "Incall",
-              "Outcall"
-            ].map((place) => (
+          <Label className="text-lg mb-2">
+            Place of services
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {["At home", "Events and parties", "Hotel / Motel", "Clubs", "Incall", "Outcall"].map((place) => (
               <FilterChip
                 key={place}
                 label={place}
@@ -468,7 +499,7 @@ export default function AdFormStep1() {
         {/* Incall Rates Table */}
         <div>
           <Label className="text-lg mb-2">
-            Incall Rates <span className="text-red-500">*</span>
+            Incall Rates
           </Label>
           <RatesTable
             rates={state.incallRates}
@@ -482,7 +513,7 @@ export default function AdFormStep1() {
         {/* Outcall Rates Table */}
         <div>
           <Label className="text-lg mb-2">
-            Outcall Rates <span className="text-red-500">*</span>
+            Outcall Rates
           </Label>
           <RatesTable
             rates={state.outcallRates}
@@ -494,14 +525,14 @@ export default function AdFormStep1() {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-end">
-          <Button
+        <div className="flex justify-end mt-8">
+          <button
             type="button"
             onClick={goToNextStep}
-            className="bg-primary text-white font-semibold py-6 px-6 rounded-lg hover:bg-primary/90 transition text-lg"
+            className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600 min-w-[180px]"
           >
             Next: Add Photos
-          </Button>
+          </button>
         </div>
       </form>
     </div>
@@ -573,6 +604,10 @@ function RatesTable({ rates, onChange }: RatesTableProps) {
     { key: "1", label: "1 Hour" },
     { key: "2", label: "2 Hours" },
     { key: "3", label: "3 Hours" },
+    { key: "6", label: "6 Hours" },
+    { key: "12", label: "12 Hours" },
+    { key: "24", label: "24 Hours" },
+    { key: "48", label: "48 Hours" },
     { key: "overnight", label: "Overnight" },
   ]
 
@@ -596,7 +631,7 @@ function RatesTable({ rates, onChange }: RatesTableProps) {
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:border-primary focus:outline-none"
               />
             </div>
-            <div className="text-gray-600 text-center">$</div>
+            <div className="text-center font-medium text-gray-600">USD</div>
           </div>
         ))}
       </div>

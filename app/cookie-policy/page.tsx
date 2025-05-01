@@ -4,10 +4,13 @@ import SiteFooter from "@/components/site-footer"
 
 export default function CookiePolicyPage() {
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
-        
+      </div>
+      
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm mb-8">
           <h1 className="text-3xl font-bold mb-6">Cookie Policy</h1>
           
@@ -73,10 +76,10 @@ export default function CookiePolicyPage() {
             </section>
           </div>
         </div>
-        
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 } 

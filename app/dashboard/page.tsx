@@ -12,15 +12,20 @@ export const metadata: Metadata = {
 
 export default function Dashboard() {
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
+      </div>
+      
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <ProtectedRoute requireVerified={true}>
           <DashboardPage />
         </ProtectedRoute>
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   );
 }

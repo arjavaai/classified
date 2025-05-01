@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, Auth } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, Firestore } from "firebase/firestore";
 
 
 // Firebase configuration with fallback to hardcoded values
@@ -19,19 +19,24 @@ const hasValidConfig =
   !!firebaseConfig.authDomain && 
   !!firebaseConfig.projectId;
 
-// Initialize Firebase with debug logging
-console.log("Initializing Firebase with config:", { 
-  ...firebaseConfig, 
-  apiKey: firebaseConfig.apiKey ? "PRESENT" : "MISSING",
-  authDomain: firebaseConfig.authDomain ? "PRESENT" : "MISSING",
-  projectId: firebaseConfig.projectId ? "PRESENT" : "MISSING",
-  // Display if env vars are loaded
-  hasValidConfig,
-  usingEnvVars: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  usingHardcoded: !process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-});
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
 
-if (!hasValidConfig) {
+// Initialize Firebase with debug logging
+if (isBrowser) {
+  console.log("Initializing Firebase with config:", { 
+    ...firebaseConfig, 
+    apiKey: firebaseConfig.apiKey ? "PRESENT" : "MISSING",
+    authDomain: firebaseConfig.authDomain ? "PRESENT" : "MISSING",
+    projectId: firebaseConfig.projectId ? "PRESENT" : "MISSING",
+    // Display if env vars are loaded
+    hasValidConfig,
+    usingEnvVars: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    usingHardcoded: !process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+  });
+}
+
+if (!hasValidConfig && isBrowser) {
   console.error("Firebase configuration is missing required values. Check your .env.local file.");
   // Fall back to hardcoded values for development only
   if (process.env.NODE_ENV === 'development') {
@@ -50,27 +55,40 @@ if (!hasValidConfig) {
   }
 }
 
-let app;
-try {
-  if (getApps().length) {
-    console.log("Firebase already initialized, getting existing app");
-    app = getApps()[0];
-  } else {
-    console.log("Creating new Firebase app instance");
-    app = initializeApp(firebaseConfig);
-  }
-} catch (error) {
-  console.error("Error initializing Firebase:", error);
-  throw error;
-}
+let app: FirebaseApp | undefined;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-console.log("Firebase Auth initialized", auth ? "successfully" : "failed");
-console.log("Firebase Firestore initialized", db ? "successfully" : "failed");
+// Only initialize Firebase in browser environments
+if (isBrowser) {
+  try {
+    if (getApps().length) {
+      console.log("Firebase already initialized, getting existing app");
+      app = getApps()[0];
+    } else {
+      console.log("Creating new Firebase app instance");
+      app = initializeApp(firebaseConfig);
+    }
+    
+    auth = getAuth(app);
+    db = getFirestore(app);
+    console.log("Firebase Auth initialized", auth ? "successfully" : "failed");
+    console.log("Firebase Firestore initialized", db ? "successfully" : "failed");
+  } catch (error) {
+    console.error("Error initializing Firebase:", error);
+    // Don't throw error, just log it to prevent build failures
+  }
+} else {
+  console.log("Skipping Firebase initialization in SSR context");
+}
 
 // Generate a unique customer ID (8 characters alphanumeric)
 const generateUniqueCustomerId = async (): Promise<string> => {
+  if (!db) {
+    console.error("Firestore not initialized");
+    return "TEMPID" + Math.random().toString(36).substring(2, 10);
+  }
+  
   const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking characters like 0, O, 1, I
   let customerId: string = '';
   let isUnique = false;
@@ -109,6 +127,11 @@ const generateUniqueCustomerId = async (): Promise<string> => {
 
 // Authentication functions
 export const signUp = async (email: string, password: string) => {
+  if (!auth || !db) {
+    console.error("Firebase not initialized");
+    return { success: false, error: "Firebase not initialized" };
+  }
+  
   console.log(`Attempting to sign up user with email: ${email.substring(0, 3)}...`);
   try {
     console.log("Calling createUserWithEmailAndPassword");
@@ -144,6 +167,11 @@ export const signUp = async (email: string, password: string) => {
 };
 
 export const signIn = async (email: string, password: string) => {
+  if (!auth) {
+    console.error("Firebase Auth not initialized");
+    return { success: false, error: "Firebase Auth not initialized" };
+  }
+  
   console.log(`Attempting to sign in user with email: ${email.substring(0, 3)}...`);
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -156,6 +184,11 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const resetPassword = async (email: string) => {
+  if (!auth) {
+    console.error("Firebase Auth not initialized");
+    return { success: false, error: "Firebase Auth not initialized" };
+  }
+  
   console.log(`Attempting to send password reset email to: ${email.substring(0, 3)}...`);
   try {
     await sendPasswordResetEmail(auth, email);
@@ -168,6 +201,11 @@ export const resetPassword = async (email: string) => {
 };
 
 export const logOut = async () => {
+  if (!auth) {
+    console.error("Firebase Auth not initialized");
+    return { success: false, error: "Firebase Auth not initialized" };
+  }
+  
   console.log("Attempting to log out user");
   try {
     await signOut(auth);
@@ -180,5 +218,7 @@ export const logOut = async () => {
 };
 
 // Export for debugging
-console.log("Firebase module loaded and exporting auth");
-export { auth, db }; 
+if (isBrowser) {
+  console.log("Firebase module loaded and exporting auth");
+}
+export { auth, db };

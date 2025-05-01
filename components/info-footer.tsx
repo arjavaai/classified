@@ -1,13 +1,31 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export default function InfoFooter() {
   return (
-    <div className="info-footer rounded-xl overflow-hidden bg-gray-50 py-8 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col items-center mb-6">
+    <section className="w-full" style={{ backgroundColor: "#eff6ff" }}>
+      <div className="max-w-7xl mx-auto py-8 px-4">
+        <div className="flex justify-between items-start mb-8">
           <div className="footer-logo">
-            <span className="text-primary font-bold text-2xl mr-1">Skluva</span>
+            <Link href="/" className="flex items-center flex-col">
+              <Image 
+                src="/assets/skluva_logo.png" 
+                alt="Skluva Logo" 
+                width={140} 
+                height={50} 
+                className="h-auto"
+                priority
+              />
+              <span className="text-xs font-bold text-gray-700 mt-1">United States</span>
+            </Link>
           </div>
+          
+          <Link
+            href="#"
+            className="bg-[#007bff] text-white font-medium rounded-[4px] px-12 py-3 hover:bg-blue-700 border border-blue-600 inline-block"
+          >
+            Create Ad
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -43,12 +61,6 @@ export default function InfoFooter() {
             <Link href="#" className="block mb-3 text-gray-600 hover:text-primary">
               FAQ
             </Link>
-            <Link
-              href="#"
-              className="mt-2 inline-block bg-primary text-white text-center px-4 py-2 rounded-md font-semibold hover:bg-primary/90 transition"
-            >
-              Create AD
-            </Link>
             <Link href="#" className="flex items-center mt-3 text-gray-600 hover:text-primary">
               Follow us
               <svg className="w-3 h-3 ml-2" viewBox="0 0 24 24" fill="currentColor">
@@ -58,6 +70,6 @@ export default function InfoFooter() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

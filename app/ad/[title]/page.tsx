@@ -21,6 +21,7 @@ import {
   Twitter,
   Instagram
 } from "lucide-react"
+import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import { WhatsAppIcon, EmailIcon, PhoneIcon } from "@/lib/icons"
@@ -38,269 +39,6 @@ import "swiper/css/navigation"
 import "swiper/css/pagination"
 import "swiper/css/free-mode"
 import "./styles.css"
-
-// Custom Header without search bar
-function ListingHeader() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      console.log("Logged out successfully");
-      toggleMenu();
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
-
-  return (
-    <header className="bg-white p-4 rounded-xl shadow-sm mb-6">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center">
-            <Image 
-              src="/assets/skluva_logo.png" 
-              alt="Skluva Logo" 
-              width={120} 
-              height={40} 
-              className="h-auto"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative" id="menuContainer">
-            {/* Desktop Menu (visible on larger screens) */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/create-ad"
-                className="btn btn-primary"
-              >
-                Create AD
-              </Link>
-              
-              {user ? (
-                <>
-                  <Link 
-                    href="/dashboard?tab=overview" 
-                    className="flex items-center gap-2 hover:text-primary font-semibold"
-                  >
-                    <div className="bg-gray-100 p-2 rounded-full">
-                      <svg
-                        className="h-5 w-5 text-primary"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect width="7" height="7" x="3" y="3" rx="1" />
-                        <rect width="7" height="7" x="14" y="3" rx="1" />
-                        <rect width="7" height="7" x="14" y="14" rx="1" />
-                        <rect width="7" height="7" x="3" y="14" rx="1" />
-                      </svg>
-                    </div>
-                    <span className="hidden sm:inline">Dashboard</span>
-                  </Link>
-                  <Link 
-                    href="/profile" 
-                    className="flex items-center gap-2 hover:text-primary font-semibold"
-                  >
-                    <div className="bg-gray-100 p-2 rounded-full">
-                      <User className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="hidden sm:inline">Profile</span>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="btn btn-secondary btn-sm">
-                    Login
-                  </Link>
-                  <Link href="/signup" className="btn btn-primary btn-sm">
-                    Signup
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Mobile Menu Toggle (visible on mobile) */}
-            <button onClick={toggleMenu} className="md:hidden text-black" aria-label="Toggle menu">
-              <Menu className="h-6 w-6" />
-            </button>
-
-            {/* Full-screen Menu (for mobile) */}
-            {isMenuOpen && (
-              <div className="fixed inset-0 bg-white z-50 overflow-y-auto md:hidden">
-                {/* Close Button */}
-                <div className="flex justify-end p-4">
-                  <button onClick={toggleMenu} className="text-gray-500 hover:text-gray-700" aria-label="Close menu">
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="container mx-auto px-6 py-4">
-                  {/* Post Your Ad Button */}
-                  <Link
-                    href="/create-ad"
-                    className="block w-full btn btn-primary btn-lg mb-6 text-center"
-                  >
-                    Create AD
-                  </Link>
-
-                  {user ? (
-                    /* User Profile Section - Show when logged in */
-                    <div className="bg-gray-100 p-6 mb-6 rounded-md">
-                      <div className="flex flex-col items-center mb-4">
-                        <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-3">
-                          <img
-                            src="/diverse-professional-profiles.png"
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="text-center">
-                          <p className="font-bold text-xl">{user.email ? user.email.split('@')[0] : 'User'}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-3">
-                        <Link
-                          href="/dashboard?tab=overview"
-                          className="flex items-center p-3 bg-white rounded-md hover:bg-gray-50"
-                          onClick={toggleMenu}
-                        >
-                          <svg
-                            className="h-5 w-5 text-primary mr-3"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect width="7" height="7" x="3" y="3" rx="1" />
-                            <rect width="7" height="7" x="14" y="3" rx="1" />
-                            <rect width="7" height="7" x="14" y="14" rx="1" />
-                            <rect width="7" height="7" x="3" y="14" rx="1" />
-                          </svg>
-                          Dashboard
-                        </Link>
-                        <Link
-                          href="/profile"
-                          className="flex items-center p-3 bg-white rounded-md hover:bg-gray-50"
-                          onClick={toggleMenu}
-                        >
-                          <User className="h-5 w-5 text-primary mr-3" />
-                          Profile
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center p-3 bg-white rounded-md hover:bg-gray-50 w-full text-left"
-                        >
-                          <svg
-                            className="h-5 w-5 text-primary mr-3"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                          </svg>
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Login/Signup Section - Show when not logged in */
-                    <div className="grid grid-cols-1 gap-3 mb-6">
-                      <Link
-                        href="/login"
-                        className="block w-full btn btn-secondary btn-lg text-center"
-                        onClick={toggleMenu}
-                      >
-                        Login
-                      </Link>
-                      <Link
-                        href="/signup"
-                        className="block w-full btn btn-primary btn-lg text-center"
-                        onClick={toggleMenu}
-                      >
-                        Signup
-                      </Link>
-                    </div>
-                  )}
-
-                  {/* Menu Items */}
-                  <div className="grid grid-cols-1 gap-3">
-                    <Link
-                      href="/"
-                      className="flex items-center p-3 bg-gray-100 rounded-md hover:bg-gray-200"
-                      onClick={toggleMenu}
-                    >
-                      <svg
-                        className="h-5 w-5 text-primary mr-3"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                        <polyline points="9 22 9 12 15 12 15 22" />
-                      </svg>
-                      Home
-                    </Link>
-                    <Link
-                      href="/us/escorts"
-                      className="flex items-center p-3 bg-gray-100 rounded-md hover:bg-gray-200"
-                      onClick={toggleMenu}
-                    >
-                      <svg
-                        className="h-5 w-5 text-primary mr-3"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      Browse Escorts
-                    </Link>
-                  </div>
-
-                  {/* Social Media Links */}
-                  <div className="flex justify-center gap-4 mt-8">
-                    <a href="#" className="text-gray-500 hover:text-primary">
-                      <Twitter className="h-6 w-6" />
-                    </a>
-                    <a href="#" className="text-gray-500 hover:text-primary">
-                      <Instagram className="h-6 w-6" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 export default function AdPage({ params }: { params: { title: string } }) {
   const [showMobileButtons, setShowMobileButtons] = useState(true);
@@ -463,11 +201,14 @@ export default function AdPage({ params }: { params: { title: string } }) {
   const citySlug = listing.location.city.toLowerCase().replace(/\s+/g, '-');
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-gray-100">
+    <div className="min-h-screen bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
+        <Header />
+      </div>
+      
+      <div className="bg-white">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <ListingHeader />
-          
           {/* Breadcrumb Navigation */}
           <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
             <Link href="/" className="text-gray-600 hover:text-primary">
@@ -590,7 +331,7 @@ export default function AdPage({ params }: { params: { title: string } }) {
         </div>
       </div>
       
-      <div className="bg-gray-100 pt-6">
+      <div className="bg-white pt-6">
         <div className="max-w-5xl mx-auto px-4 pb-8">
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

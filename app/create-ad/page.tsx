@@ -5,13 +5,18 @@ import CreateAdForm from "@/components/create-ad/create-ad-form"
 
 export default function CreateAdPage() {
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white min-h-screen">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
-        <CreateAdForm />
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <div className="w-full">
+        <CreateAdForm />
+      </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 }

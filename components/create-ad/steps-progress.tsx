@@ -1,52 +1,63 @@
 "use client"
 
+import { ChevronRight } from "lucide-react"
+
 interface StepsProgressProps {
   currentStep: number
 }
 
 export default function StepsProgress({ currentStep }: StepsProgressProps) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <div className="flex justify-between items-start max-w-3xl mx-auto relative">
-        {/* Progress line connecting steps */}
-        <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 z-0"></div>
-
-        {/* Step indicators with equal width containers */}
-        <div className="flex-1 flex flex-col items-center">
-          <StepIndicator step={1} currentStep={currentStep} label="Add information" />
+    <div className="bg-white p-4 rounded-xl shadow-sm mb-8 border border-gray-100">
+      <div className="flex justify-between items-center max-w-3xl mx-auto relative">
+        {/* Step 1 */}
+        <div className="flex items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+              currentStep >= 1 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            1
+          </div>
+          <span className={`ml-3 font-bold ${currentStep >= 1 ? "text-[#007bff]" : "text-gray-500"}`}>
+            Add information
+          </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
-          <StepIndicator step={2} currentStep={currentStep} label="Photos" />
+        {/* Chevron 1 */}
+        <ChevronRight className="h-6 w-6 text-gray-300 hidden md:block" />
+
+        {/* Step 2 */}
+        <div className="flex items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+              currentStep >= 2 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            2
+          </div>
+          <span className={`ml-3 font-bold ${currentStep >= 2 ? "text-[#007bff]" : "text-gray-500"}`}>
+            Photos
+          </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
-          <StepIndicator step={3} currentStep={currentStep} label="Finish" />
+        {/* Chevron 2 */}
+        <ChevronRight className="h-6 w-6 text-gray-300 hidden md:block" />
+
+        {/* Step 3 */}
+        <div className="flex items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+              currentStep >= 3 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            3
+          </div>
+          <span className={`ml-3 font-bold ${currentStep >= 3 ? "text-[#007bff]" : "text-gray-500"}`}>
+            Finish
+          </span>
         </div>
       </div>
-    </div>
-  )
-}
-
-interface StepIndicatorProps {
-  step: number
-  currentStep: number
-  label: string
-}
-
-function StepIndicator({ step, currentStep, label }: StepIndicatorProps) {
-  const isActive = step <= currentStep
-
-  return (
-    <div className="flex flex-col items-center z-10">
-      <div
-        className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold mb-2 ${
-          isActive ? "bg-primary text-white" : "bg-gray-200 text-gray-400"
-        }`}
-      >
-        {step}
-      </div>
-      <p className={`text-center ${isActive ? "text-primary font-medium" : "text-gray-400"}`}>{label}</p>
     </div>
   )
 }

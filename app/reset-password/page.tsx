@@ -5,13 +5,18 @@ import ResetPasswordForm from "@/components/auth/reset-password-form"
 
 export default function ResetPasswordPage() {
   return (
-    <div className="bg-gray-100">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="bg-white">
+      {/* Full-width header */}
+      <div className="w-full bg-white">
         <Header />
-        <ResetPasswordForm />
-        <InfoFooter />
-        <SiteFooter />
       </div>
+      
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <ResetPasswordForm />
+      </div>
+      
+      <InfoFooter />
+      <SiteFooter />
     </div>
   )
 } 

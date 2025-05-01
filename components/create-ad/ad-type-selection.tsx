@@ -1,186 +1,304 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useAdCreation } from "./ad-creation-context"
+import { Crown, Check, AlertCircle, Award, Calendar, Image as ImageIcon, MapPin, BarChart, Phone, Zap, RefreshCw, List } from "lucide-react"
+import Image from "next/image"
+import ReactConfetti from 'react-confetti'
 
 export default function AdTypeSelection() {
   const { dispatch } = useAdCreation()
+  const [selectedAdType, setSelectedAdType] = useState<string | null>(null)
+  const [showError, setShowError] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0
+  })
 
-  const startCreateAd = () => {
-    dispatch({ type: "SET_AD_TYPE", payload: "standard" })
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (selectedAdType === 'premium') {
+      setShowConfetti(true)
+      const timer = setTimeout(() => {
+        setShowConfetti(false)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [selectedAdType])
+
+  const handleAdTypeSelection = (adType: string) => {
+    setSelectedAdType(adType)
+    setShowError(false)
+  }
+
+  const handleNext = () => {
+    if (!selectedAdType) {
+      setShowError(true)
+      return
+    }
+    
+    dispatch({ type: "SET_AD_TYPE", payload: selectedAdType })
     dispatch({ type: "SET_STEP", payload: 1 })
   }
 
   return (
-    <>
+    <div className="bg-gray-50 min-h-screen relative">
+      {showConfetti && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <ReactConfetti
+            width={windowSize.width}
+            height={windowSize.height}
+            recycle={false}
+            numberOfPieces={500}
+            colors={['#007bff', '#ffd700', '#ff6b6b', '#4ecdc4', '#9c88ff']}
+          />
+        </div>
+      )}
       {/* Header with Logo */}
-      <header className="bg-primary text-white py-8 -mx-4 px-4 mb-10 text-center">
-        <h1 className="text-4xl font-bold">Types of Ads</h1>
+      <header className="bg-[#007bff] text-white py-6 w-full">
+        <div className="container mx-auto text-center">
+          <h1 className="text-4xl font-bold">Types of Ads</h1>
+        </div>
       </header>
 
-      {/* Ad Preview Section */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <div className="flex justify-between items-center mb-6 border-b pb-4">
-          <h2 className="text-xl font-semibold">How your ad will look like after posting</h2>
-        </div>
-
-        {/* Ad Preview Card */}
-        <div className="listing-card flex border border-gray-200 rounded-xl overflow-hidden mb-8">
-          <div className="relative w-[120px] md:w-[200px] h-[140px] md:h-[200px] flex-shrink-0">
-            <img src="/placeholder.svg?key=ebsk5" alt="Ad Preview" className="w-full h-full object-cover" />
-            <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded text-xs flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 text-primary mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              5
-            </div>
-          </div>
-          <div className="p-3 md:p-4 flex-grow relative">
-            <div className="text-accent-blue font-bold text-sm md:text-base mb-1">
-              GENUINE Cash in hand payment HIGH PROFILE SERVICE AVAILABLE IN LA
-            </div>
-            <p className="text-gray-700 text-xs mb-2 line-clamp-2">
-              Call me for HAND PAYMENT ONLY genuine Escorts Services Safe & Secure High Class Services Affordable Rate
-              100% satisfaction guaranteed
-            </p>
-            <div className="flex items-center text-xs text-gray-600 mb-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 text-gray-400 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>21 years</span>
-            </div>
-            <div className="flex items-center text-xs text-gray-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 text-gray-400 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Los Angeles / Beverly Hills</span>
-              <span className="bg-green-500 text-white text-[10px] px-1 py-0.5 rounded ml-2 font-semibold">Top</span>
-            </div>
-            <div className="absolute top-3 md:top-4 right-3 md:right-4 bg-green-500 text-white px-2 py-1 rounded text-xs md:text-sm font-semibold">
-              $150
-            </div>
+      {/* Ad Types Section */}
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Premium Image Card */}
+        <div className="bg-white rounded-xl shadow-md border border-blue-200 overflow-hidden mb-8">
+          <div className="relative w-full h-96 md:h-[450px] lg:h-[500px]">
+            <Image 
+              src="/assets/premium_placeholder.png" 
+              alt="Premium Ad Example" 
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
         </div>
-
-        {/* Premium Benefits Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-primary mb-2">🌟 Premium Advertising Benefits</h3>
-            <p className="text-gray-600">Stand Out & Get Noticed</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Column 1 */}
-            <div className="space-y-4">
-              <BenefitItem
-                icon="expand"
-                title="Maximum Visibility"
-                description="Your ad appears in a larger format across key pages, ensuring it instantly catches attention."
-              />
-              <BenefitItem
-                icon="images"
-                title="Scrolling Images"
-                description="Display your images in an exclusive auto-scrolling format for maximum exposure."
-              />
-              <BenefitItem
-                icon="camera"
-                title="10 High-Quality Images"
-                description="Attract more attention with up to 10 stunning, high-resolution images."
-              />
-            </div>
-
-            {/* Column 2 */}
-            <div className="space-y-4">
-              <BenefitItem
-                icon="map-marker-alt"
-                title="Regional Targeting"
-                description="Target specific cities or states to reach your local audience effectively."
-              />
-              <BenefitItem
-                icon="chart-line"
-                title="Massive Traffic Reach"
-                description="Benefit from our high daily traffic and engaged user base."
-              />
-              <BenefitItem
-                icon="phone-alt"
-                title="Direct Contact Links"
-                description="Easy access to call, WhatsApp, or email right from your profile."
-              />
-            </div>
-
-            {/* Column 3 */}
-            <div className="space-y-4">
-              <BenefitItem
-                icon="bolt"
-                title="Instant Ad Approval"
-                description="Skip the waiting time with priority moderation."
-              />
-              <BenefitItem
-                icon="redo"
-                title="Repost Feature"
-                description="Keep your ad fresh by easily reposting it without creating new listings."
-              />
-              <BenefitItem
-                icon="list"
-                title="Multiple Listings"
-                description="Post as many listings as you like without restrictions."
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center mt-6">
-          <button
-            className="bg-primary text-white font-semibold py-3 px-8 rounded-lg hover:bg-primary-light transition text-lg"
-            onClick={startCreateAd}
+        
+        <div className="flex flex-col gap-6 mb-8">
+          {/* Free Ad Card */}
+          <div 
+            className={`bg-white rounded-xl shadow-sm border ${selectedAdType === 'free' ? 'border-blue-500' : 'border-gray-200'} overflow-hidden flex flex-col cursor-pointer transition-all hover:shadow-md`}
+            onClick={() => handleAdTypeSelection('free')}
           >
-            Next
-          </button>
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl text-gray-700 font-semibold">Free Ad</h2>
+                {selectedAdType === 'free' && (
+                  <div className="bg-[#007bff] text-white p-1 rounded-full">
+                    <Check className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              <p className="text-gray-600 mb-4">Perfect if you want to get noticed fast with no cost</p>
+              
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">10 Images included.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">One ad per day.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">Repost next day.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">Expires at 11:59 PM on the same day.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">Limited visibility.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className="text-gray-600">Appears in city listings.</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="mt-auto p-4 border-t border-gray-200">
+              <button
+                className={`w-full py-3 px-4 ${selectedAdType === 'free' ? 'bg-[#007bff] text-white' : 'bg-gray-200 text-gray-700'} font-medium rounded-md transition`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAdTypeSelection('free');
+                }}
+              >
+                {selectedAdType === 'free' ? (
+                  <span className="flex items-center justify-center">
+                    <Check className="h-5 w-5 mr-2" /> Selected
+                  </span>
+                ) : 'Choose'}
+              </button>
+            </div>
+          </div>
+          
+          {/* Premium Ad Card */}
+          <div 
+            className={`bg-white rounded-xl shadow-md border ${selectedAdType === 'premium' ? 'border-blue-500' : 'border-blue-200'} overflow-hidden flex flex-col relative cursor-pointer transition-all hover:shadow-md`}
+            onClick={() => handleAdTypeSelection('premium')}
+          >
+            <div className="bg-blue-50 p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="bg-yellow-400 p-1.5 rounded-full">
+                      <Crown className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-xl text-gray-800 font-bold">Premium Ad – $12.95</h2>
+                  </div>
+                  <p className="text-gray-700 font-bold">Maximize your ad's exposure with premium features, staying visible for 30 days.</p>
+                </div>
+                {selectedAdType === 'premium' && (
+                  <div className="bg-[#007bff] text-white p-1 rounded-full ml-4">
+                    <Check className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <ul className="space-y-4 mb-6">
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">30 Days Active</span>
+                    <span className="text-gray-700 font-medium"> – Your ad stays live for a full 30 days.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Scrolling Image Gallery</span>
+                    <span className="text-gray-700 font-medium"> – Showcase up to 10 high-quality images in an auto-scrolling display.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Regional Targeting</span>
+                    <span className="text-gray-700 font-medium"> – Choose specific cities or states for focused visibility.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Larger Ad Placement</span>
+                    <span className="text-gray-700 font-medium"> – Featured prominently across key high-traffic pages.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <BarChart className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Massive Traffic Reach</span>
+                    <span className="text-gray-700 font-medium"> – Gain exposure.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <Phone className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Direct Contact Links</span>
+                    <span className="text-gray-700 font-medium"> – Let clients reach you via call, WhatsApp, or email instantly.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <Zap className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Instant Ad Approval</span>
+                    <span className="text-gray-700 font-medium"> – Get listed quickly with priority moderation.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <RefreshCw className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Repost Feature</span>
+                    <span className="text-gray-700 font-medium"> – Bump your ad anytime in $1 to stay fresh and visible.</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-500 mr-3 mt-0.5">
+                    <List className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-gray-800 font-bold">Unlimited Listings</span>
+                    <span className="text-gray-700 font-medium"> – Post as many ads as you want, with no restrictions.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="mt-auto p-4 border-t border-blue-100 bg-blue-50">
+              <button
+                className={`w-full py-3 px-4 ${selectedAdType === 'premium' ? 'bg-[#007bff] text-white' : 'bg-blue-100 text-blue-700'} font-medium rounded-md transition`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAdTypeSelection('premium');
+                }}
+              >
+                {selectedAdType === 'premium' ? (
+                  <span className="flex items-center justify-center">
+                    <Check className="h-5 w-5 mr-2" /> Selected
+                  </span>
+                ) : 'Choose'}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </>
-  )
-}
-
-interface BenefitItemProps {
-  icon: string
-  title: string
-  description: string
-}
-
-function BenefitItem({ icon, title, description }: BenefitItemProps) {
-  return (
-    <div className="flex items-start">
-      <i className={`fas fa-${icon} text-primary mt-1 mr-3`}></i>
-      <div>
-        <h4 className="font-semibold text-gray-800 mb-1">{title}</h4>
-        <p className="text-sm text-gray-600">{description}</p>
+        
+        <div className="flex flex-col md:flex-row items-center justify-between mt-8">
+          {/* Error notification moved to the left */}
+          <div className="w-full md:w-auto mb-4 md:mb-0">
+            {showError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-center whitespace-nowrap">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                <span>Please select an ad type to continue</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Next button moved to the right */}
+          <div className="w-full flex justify-end">
+            <button
+              className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600 w-full md:w-64"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

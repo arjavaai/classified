@@ -13,7 +13,21 @@ import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // Filter options data
 const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
-const nationalities = ["Indian", "is South African", "is Russian", "is Kenyan"]
+const nationalities = ["Indian", "South African", "Russian", "Kenyan"]
+const allNationalities = [
+  "Albanian", "American", "Arabic", "Argentinian", "Australian", "Austrian", 
+  "Bangladeshi", "Belgian", "Bolivian", "Bosnian", "Brazilian", "Bulgarian", 
+  "Canadian", "Chilean", "Chinese", "Colombian", "Costa Rican", "Croatian", 
+  "Cuban", "Czech", "Danisn", "Dominican", "Dutch", "Ecuadorian", "English", 
+  "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Guatemalan", 
+  "Haitian", "Honduran", "Hungarian", "Indian", "Indonesian", "Irish", "Italian", 
+  "Jamaican", "Japanese", "Kenyan", "Letvian", "Lithuanian", "Malaysian", 
+  "Maldivian", "Mexican", "Moldovan", "Moroccan", "NewZealander", "Nicaraguan", 
+  "Nigerian", "Norwegian", "Pakistani", "Panamanian", "Paraguayan", "Peruvian", 
+  "Polish", "Portuguese", "Romanian", "Russian", "Senegalese", "Serbian", 
+  "Singaporean", "South African", "Spanish", "Swedish", "Swiss", "Thai", 
+  "Tunisian", "Turkish", "Ukrainian", "Uruguayan", "Venezuelan", "Vietnamese"
+]
 const bodyTypes = ["Slender", "Athletic", "Curvy", "BBW"]
 const breastTypes = ["Natural Boobs", "Busty"]
 const hairColors = ["Blond Hair", "Brown Hair", "Black Hair", "Red Hair", "Others"]
@@ -42,6 +56,7 @@ export default function SearchModal() {
   const router = useRouter()
   const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
   const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([])
+  const [showAllNationalities, setShowAllNationalities] = useState(false)
 
   // Load states when component mounts
   useEffect(() => {
@@ -127,107 +142,138 @@ export default function SearchModal() {
     closeModal()
   }
 
+  if (!isModalOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isModalOpen && (
-        <motion.div
-          className="fixed inset-0 bg-white z-50 overflow-y-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b z-10">
-            <div className="flex justify-between items-center p-4">
-              <h2 className="text-lg font-semibold">Search</h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-                aria-label="Close search"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-4">
-            {/* Category and Location Dropdowns */}
-            <div className="mb-4">
-              <div className="border border-gray-200 rounded p-2 mb-2 bg-gray-50">
-                <span className="text-gray-700">Escorts</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <select
-                  className="border border-gray-200 rounded p-2 w-full"
-                  value={filters.state}
-                  onChange={(e) => dispatch({ type: "SET_STATE", payload: e.target.value })}
-                  aria-label="Select state"
-                >
-                  <option value="">States</option>
-                  {statesList.map((state) => (
-                    <option key={state.abbreviation} value={state.abbreviation}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="border border-gray-200 rounded p-2 w-full"
-                  value={filters.city}
-                  onChange={(e) => dispatch({ type: "SET_CITY", payload: e.target.value })}
-                  disabled={!filters.state}
-                  aria-label="Select city"
-                >
-                  <option value="">All the cities</option>
-                  {citiesList.map((city) => (
-                    <option key={city.slug} value={city.slug}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <Input
-                type="text"
-                placeholder="Search here..."
-                value={filters.searchText}
-                onChange={(e) => dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value })}
-                className="w-full mt-2 mb-4"
-                aria-label="Search text"
-              />
-            </div>
-
-            {/* Filters Header */}
-            <div className="flex items-center mb-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay */}
+      <div 
+        className="fixed inset-0 bg-black/30" 
+        onClick={closeModal}
+      />
+      
+      {/* Modal Container */}
+      <div 
+        className="bg-white rounded-md shadow-lg w-[800px] max-w-[95vw] max-h-[90vh] z-50 overflow-hidden flex flex-col"
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b z-10">
+          <div className="flex justify-between items-center p-4">
+            <div className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-primary mr-2"
+                className="mr-2"
               >
-                <line x1="4" y1="21" x2="4" y2="14"></line>
-                <line x1="4" y1="10" x2="4" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12" y2="3"></line>
-                <line x1="20" y1="21" x2="20" y2="16"></line>
-                <line x1="20" y1="12" x2="20" y2="3"></line>
-                <line x1="1" y1="14" x2="7" y2="14"></line>
-                <line x1="9" y1="8" x2="15" y2="8"></line>
-                <line x1="17" y1="16" x2="23" y2="16"></line>
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <span className="text-sm font-medium">Filters</span>
+              <h2 className="text-lg font-semibold">Search</h2>
+            </div>
+            <button
+              onClick={closeModal}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="Close search"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 px-6 overflow-y-auto">
+          {/* Category and Location Dropdowns */}
+          <div className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <select
+                className="border border-gray-200 rounded-md p-3 w-full h-12"
+                value={filters.state}
+                onChange={(e) => dispatch({ type: "SET_STATE", payload: e.target.value })}
+                aria-label="Select state"
+              >
+                <option value="">All Regions</option>
+                {statesList.map((state) => (
+                  <option key={state.abbreviation} value={state.abbreviation}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                className="border border-gray-200 rounded-md p-3 w-full h-12"
+                value={filters.city}
+                onChange={(e) => dispatch({ type: "SET_CITY", payload: e.target.value })}
+                disabled={!filters.state}
+                aria-label="Select city"
+              >
+                <option value="">Cities {!filters.state ? "not available" : ""}</option>
+                {citiesList.map((city) => (
+                  <option key={city.slug} value={city.slug}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Price Range Slider */}
+          <div className="mb-6">
+            <h3 className="text-sm font-medium mb-2">Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}</h3>
+            <Slider
+              defaultValue={[0, 1000]}
+              min={0}
+              max={1000}
+              step={50}
+              value={filters.priceRange}
+              onValueChange={(value) => dispatch({ type: "SET_PRICE_RANGE", payload: value as [number, number] })}
+              className="my-4"
+            />
+          </div>
+
+          {/* Filter Sections */}
+          <div className="space-y-0">
+            {/* Filters Header */}
+            <div className="flex items-center justify-between mb-1 border-b pb-1">
+              <div className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-primary mr-2"
+                >
+                  <line x1="4" y1="21" x2="4" y2="14"></line>
+                  <line x1="4" y1="10" x2="4" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12" y2="3"></line>
+                  <line x1="20" y1="21" x2="20" y2="16"></line>
+                  <line x1="20" y1="12" x2="20" y2="3"></line>
+                  <line x1="1" y1="14" x2="7" y2="14"></line>
+                  <line x1="9" y1="8" x2="15" y2="8"></line>
+                  <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span className="text-base font-bold">Filters</span>
+              </div>
+              <button
+                onClick={() => dispatch({ type: "CLEAR_ALL" })}
+                className="text-primary hover:text-primary-dark font-medium"
+              >
+                All Clear
+              </button>
             </div>
 
-            {/* Ethnicity Filter */}
             <FilterSection title="Ethnicity" selectedCount={filters.ethnicity.length}>
               <div className="flex flex-wrap gap-2">
                 {ethnicities.map((ethnicity) => (
@@ -235,7 +281,10 @@ export default function SearchModal() {
                     key={ethnicity}
                     isSelected={filters.ethnicity.includes(ethnicity)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "ethnicity", value: ethnicity } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "ethnicity", value: ethnicity },
+                      })
                     }
                   >
                     {ethnicity}
@@ -244,35 +293,71 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Nationality Filter */}
             <FilterSection title="Nationality" selectedCount={filters.nationality.length}>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-2">
                 {nationalities.map((nationality) => (
                   <FilterButton
                     key={nationality}
                     isSelected={filters.nationality.includes(nationality)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "nationality", value: nationality } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "nationality", value: nationality },
+                      })
                     }
                   >
                     {nationality}
                   </FilterButton>
                 ))}
+                
+                <AnimatePresence>
+                  {showAllNationalities && (
+                    <motion.div 
+                      className="flex flex-wrap gap-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {allNationalities
+                        .filter(nat => !nationalities.includes(nat))
+                        .map((nationality) => (
+                          <FilterButton
+                            key={nationality}
+                            isSelected={filters.nationality.includes(nationality)}
+                            onClick={() =>
+                              dispatch({
+                                type: "TOGGLE_FILTER",
+                                payload: { category: "nationality", value: nationality },
+                              })
+                            }
+                          >
+                            {nationality}
+                          </FilterButton>
+                        ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <button className="text-xs text-primary mt-2 hover:underline focus:outline-none focus:underline">
-                + Show all
+              <button
+                onClick={() => setShowAllNationalities(!showAllNationalities)}
+                className="text-primary hover:text-primary-dark font-medium text-sm mt-1"
+              >
+                {showAllNationalities ? "Show Less" : "Show More"}
               </button>
             </FilterSection>
 
-            {/* Body Type Filter */}
-            <FilterSection title="Body type" selectedCount={filters.bodyType.length}>
+            <FilterSection title="Body Type" selectedCount={filters.bodyType.length}>
               <div className="flex flex-wrap gap-2">
                 {bodyTypes.map((bodyType) => (
                   <FilterButton
                     key={bodyType}
                     isSelected={filters.bodyType.includes(bodyType)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "bodyType", value: bodyType } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "bodyType", value: bodyType },
+                      })
                     }
                   >
                     {bodyType}
@@ -281,15 +366,17 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Breast Filter */}
-            <FilterSection title="Breast" selectedCount={filters.breastType.length}>
+            <FilterSection title="Breast Type" selectedCount={filters.breastType.length}>
               <div className="flex flex-wrap gap-2">
                 {breastTypes.map((breastType) => (
                   <FilterButton
                     key={breastType}
                     isSelected={filters.breastType.includes(breastType)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "breastType", value: breastType } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "breastType", value: breastType },
+                      })
                     }
                   >
                     {breastType}
@@ -298,15 +385,17 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Hair Filter */}
-            <FilterSection title="Hair" selectedCount={filters.hairColor.length}>
+            <FilterSection title="Hair Color" selectedCount={filters.hairColor.length}>
               <div className="flex flex-wrap gap-2">
                 {hairColors.map((hairColor) => (
                   <FilterButton
                     key={hairColor}
                     isSelected={filters.hairColor.includes(hairColor)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "hairColor", value: hairColor } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "hairColor", value: hairColor },
+                      })
                     }
                   >
                     {hairColor}
@@ -315,15 +404,17 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Age Filter */}
-            <FilterSection title="Age" selectedCount={filters.ageRange.length}>
+            <FilterSection title="Age Range" selectedCount={filters.ageRange.length}>
               <div className="flex flex-wrap gap-2">
                 {ageRanges.map((ageRange) => (
                   <FilterButton
                     key={ageRange}
                     isSelected={filters.ageRange.includes(ageRange)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "ageRange", value: ageRange } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "ageRange", value: ageRange },
+                      })
                     }
                   >
                     {ageRange}
@@ -332,29 +423,6 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Rate Filter */}
-            <FilterSection title="Rate">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-700">${filters.priceRange[0]}</span>
-                  <span className="text-gray-700">
-                    {filters.priceRange[1] >= 1000 ? "$1000+" : `$${filters.priceRange[1]}`}
-                  </span>
-                </div>
-                <div className="relative">
-                  <Slider
-                    value={filters.priceRange}
-                    min={0}
-                    max={1000}
-                    step={10}
-                    onValueChange={(value) => dispatch({ type: "SET_PRICE_RANGE", payload: value as [number, number] })}
-                    className="mt-2"
-                  />
-                </div>
-              </div>
-            </FilterSection>
-
-            {/* Services Filter */}
             <FilterSection title="Services" selectedCount={filters.services.length}>
               <div className="flex flex-wrap gap-2">
                 {services.map((service) => (
@@ -362,7 +430,10 @@ export default function SearchModal() {
                     key={service}
                     isSelected={filters.services.includes(service)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "services", value: service } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "services", value: service },
+                      })
                     }
                   >
                     {service}
@@ -371,15 +442,17 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Caters To Filter */}
-            <FilterSection title="Caters to" selectedCount={filters.catersTo.length}>
+            <FilterSection title="Caters To" selectedCount={filters.catersTo.length}>
               <div className="flex flex-wrap gap-2">
                 {catersTo.map((caterTo) => (
                   <FilterButton
                     key={caterTo}
                     isSelected={filters.catersTo.includes(caterTo)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "catersTo", value: caterTo } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "catersTo", value: caterTo },
+                      })
                     }
                   >
                     {caterTo}
@@ -388,15 +461,17 @@ export default function SearchModal() {
               </div>
             </FilterSection>
 
-            {/* Place of Service Filter */}
-            <FilterSection title="Place of service" selectedCount={filters.placeOfService.length}>
+            <FilterSection title="Place of Service" selectedCount={filters.placeOfService.length}>
               <div className="flex flex-wrap gap-2">
                 {placesOfService.map((place) => (
                   <FilterButton
                     key={place}
                     isSelected={filters.placeOfService.includes(place)}
                     onClick={() =>
-                      dispatch({ type: "TOGGLE_FILTER", payload: { category: "placeOfService", value: place } })
+                      dispatch({
+                        type: "TOGGLE_FILTER",
+                        payload: { category: "placeOfService", value: place },
+                      })
                     }
                   >
                     {place}
@@ -405,29 +480,20 @@ export default function SearchModal() {
               </div>
             </FilterSection>
           </div>
+        </div>
 
-          {/* Footer */}
-          <motion.div
-            className="sticky bottom-0 bg-white border-t p-4 flex gap-4"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <button
-              onClick={() => dispatch({ type: "CLEAR_ALL" })}
-              className="flex-1 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition-colors"
-            >
-              CLEAR ALL
-            </button>
+        {/* Footer with Search Button */}
+        <div className="sticky bottom-0 bg-white border-t p-4 px-6 mt-auto">
+          <div className="flex justify-end">
             <button
               onClick={handleSearch}
-              className="flex-1 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary/90 transition-colors"
+              className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600"
             >
-              SEARCH
+              Search
             </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
