@@ -92,7 +92,10 @@ export default function AdTypeSelection() {
           {/* Free Ad Card */}
           <div 
             className={`bg-white rounded-xl shadow-sm border ${selectedAdType === 'free' ? 'border-blue-500' : 'border-gray-200'} overflow-hidden flex flex-col cursor-pointer transition-all hover:shadow-md`}
-            onClick={() => handleAdTypeSelection('free')}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAdTypeSelection('free');
+            }}
           >
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -153,7 +156,10 @@ export default function AdTypeSelection() {
           {/* Premium Ad Card */}
           <div 
             className={`bg-white rounded-xl shadow-md border ${selectedAdType === 'premium' ? 'border-blue-500' : 'border-blue-200'} overflow-hidden flex flex-col relative cursor-pointer transition-all hover:shadow-md`}
-            onClick={() => handleAdTypeSelection('premium')}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAdTypeSelection('premium');
+            }}
           >
             <div className="bg-blue-50 p-6">
               <div className="flex justify-between items-start">
@@ -292,7 +298,7 @@ export default function AdTypeSelection() {
           {/* Next button moved to the right */}
           <div className="w-full flex justify-end">
             <button
-              className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600 w-full md:w-64"
+              className="bg-[#007bff] text-white font-bold text-lg rounded-[4px] px-10 py-5 hover:bg-blue-700 border border-blue-600 w-full md:w-64"
               onClick={handleNext}
             >
               Next

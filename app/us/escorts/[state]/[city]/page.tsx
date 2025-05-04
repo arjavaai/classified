@@ -7,6 +7,7 @@ import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import ImageCarousel from "@/components/listing-card/ImageCarousel"
+import Pagination from "@/components/pagination"
 import { sampleAds, Ad } from "@/lib/ads-data"
 import { usaStatesAndCitiesData } from "@/lib/demo-data"
 import { 
@@ -21,6 +22,9 @@ export default function CityPage({ params }: { params: { state: string; city: st
   const [listings, setListings] = useState<Ad[]>([])
   const [stateName, setStateName] = useState("")
   const [cityName, setCityName] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
   
   useEffect(() => {
     // Get state name from slug
@@ -43,9 +47,30 @@ export default function CityPage({ params }: { params: { state: string; city: st
         )
         
         setListings(cityAds)
+        
+        // Calculate total pages
+        setTotalPages(Math.max(1, Math.ceil(cityAds.length / itemsPerPage)))
       }
     }
   }, [params.state, params.city])
+  
+  // Get current page from URL on client-side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const page = parseInt(urlParams.get('page') || '1')
+      setCurrentPage(isNaN(page) || page < 1 ? 1 : page)
+    }
+  }, [])
+  
+  // Get paginated listings
+  const getPaginatedListings = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return listings.slice(startIndex, endIndex)
+  }
+  
+  const paginatedListings = getPaginatedListings()
 
   return (
     <div className="bg-white">
@@ -54,7 +79,7 @@ export default function CityPage({ params }: { params: { state: string; city: st
         <Header />
       </div>
       
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-1 sm:px-4 py-8 w-full">
         {/* Breadcrumb Navigation */}
         <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
           <Link href="/" className="text-gray-600 hover:text-primary">
@@ -65,7 +90,12 @@ export default function CityPage({ params }: { params: { state: string; city: st
             {stateName} Escorts
           </Link>
           <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-          <span className="text-accent-blue font-medium">{cityName} Escorts</span>
+          <Link 
+            href={`/us/escorts/${params.state}/${params.city}`} 
+            className="text-accent-blue font-medium hover:text-primary"
+          >
+            {cityName} Escorts
+          </Link>
         </div>
 
         {/* Location Heading */}
@@ -78,17 +108,12 @@ export default function CityPage({ params }: { params: { state: string; city: st
           {new Date().toLocaleDateString("en-US", { day: "2-digit", month: "long" }).toUpperCase()}
         </div>
 
-        {/* Results Count */}
-        <div className="text-sm text-gray-600 mb-4">
-          {listings.length} {listings.length === 1 ? "escort" : "escorts"} in {cityName}, {stateName}
-        </div>
-
         {/* Listings */}
         {listings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
-            {listings.map((listing) => (
-              <Link href={getAdUrl(listing.title, listing.id)} key={listing.id} className="block no-underline text-black">
-                <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[220px]">
+            {paginatedListings.map((listing) => (
+              <Link href={getAdUrl(listing.title, listing.id)} key={listing.id} className="block no-underline text-black w-[99%] mx-auto sm:w-full">
+                <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[253px] sm:h-[220px] md:h-[220px]">
                   <ImageCarousel 
                     images={listing.images || [listing.image]} 
                     photoCount={listing.photoCount}
@@ -121,6 +146,15 @@ export default function CityPage({ params }: { params: { state: string; city: st
               Try browsing other cities in {stateName} or check back later for new listings.
             </p>
           </div>
+        )}
+        
+        {/* Pagination */}
+        {listings.length > 0 && (
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl={`/us/escorts/${params.state}/${params.city}`}
+          />
         )}
       </div>
       

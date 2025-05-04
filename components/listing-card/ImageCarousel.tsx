@@ -4,12 +4,11 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // Import required modules
-import { Pagination, Navigation } from 'swiper/modules'
+import { Pagination, Autoplay } from 'swiper/modules'
 
 // Import Swiper styles
 import 'swiper/css'
 import 'swiper/css/pagination'
-import 'swiper/css/navigation'
 
 interface ImageCarouselProps {
   images: string[]
@@ -23,21 +22,28 @@ export default function ImageCarousel({ images, photoCount }: ImageCarouselProps
 
   return (
     <div 
-      className="relative w-[170px] min-w-[170px] h-[220px] listing-image-carousel"
+      className="relative w-[170px] min-w-[170px] h-full listing-image-carousel"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       style={{ minWidth: '170px' }}
     >
       <Swiper
-        modules={[Pagination, Navigation]}
+        modules={[Pagination, Autoplay]}
         spaceBetween={0}
         slidesPerView={1}
         pagination={{
           clickable: true,
         }}
-        navigation={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
         loop={allImages.length > 1}
         className="h-full w-full"
+        grabCursor={true}
+        simulateTouch={true}
+        touchEventsTarget="container"
       >
         {allImages.map((image, index) => (
           <SwiperSlide key={index}>
@@ -53,7 +59,7 @@ export default function ImageCarousel({ images, photoCount }: ImageCarouselProps
         ))}
       </Swiper>
       
-      <div className="absolute bottom-2 left-2 z-20 bg-white bg-opacity-80 px-1.5 py-0.5 rounded text-xs font-medium">
+      <div className="absolute bottom-2 left-2 z-20 bg-black bg-opacity-50 px-1.5 py-0.5 rounded text-xs font-medium text-white">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -62,7 +68,7 @@ export default function ImageCarousel({ images, photoCount }: ImageCarouselProps
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="inline-block w-3 h-3 mr-1 text-primary"
+          className="inline-block w-3 h-3 mr-1 text-white"
         >
           <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
           <circle cx="12" cy="13" r="3" />

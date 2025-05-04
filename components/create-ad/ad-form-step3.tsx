@@ -2,11 +2,9 @@
 
 import { useAdCreation } from "./ad-creation-context"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
 
 export default function AdFormStep3() {
   const { state, dispatch } = useAdCreation()
@@ -48,117 +46,34 @@ export default function AdFormStep3() {
     }
   }
 
-  // Get the 1-hour rate for the preview
-  const oneHourRate = state.incallRates["1"] || "150"
-
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-semibold text-center mb-8">Terms, Conditions and Privacy Policy</h2>
-
-      {/* Ad Preview */}
-      <div className="mb-8 border border-gray-200 rounded-xl overflow-hidden">
-        <div className="bg-gray-100 p-4 flex justify-between items-center border-b">
-          <h3 className="font-semibold text-lg">Ad Preview</h3>
-          <button
-            type="button"
-            className="text-primary text-sm flex items-center"
-            onClick={() => dispatch({ type: "SET_STEP", payload: 1 })}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-            Edit
-          </button>
-        </div>
-
-        <div className="p-4">
-          {/* Preview Card */}
-          <div className="listing-card flex border border-gray-200 rounded-xl overflow-hidden">
-            <div className="relative w-[120px] md:w-[200px] h-[140px] md:h-[200px] flex-shrink-0">
-              {state.photos.length > 0 ? (
-                <img
-                  src={state.photos[0] || "/placeholder.svg"}
-                  alt="Ad Preview"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                  <span className="text-gray-500 font-medium">Your Images</span>
-                </div>
-              )}
-              <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded text-xs flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3 text-primary mr-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {state.photos.length}
-              </div>
-            </div>
-            <div className="p-3 md:p-4 flex-grow relative">
-              <div className="text-accent-blue font-bold text-sm md:text-base mb-1">
-                {state.title || "Your Ad Title"}
-              </div>
-              <p className="text-gray-700 text-xs mb-2 line-clamp-2">
-                {state.description || "Your description will appear here."}
-              </p>
-              <div className="flex items-center text-xs text-gray-600 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3 text-gray-400 mr-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{state.age ? `${state.age} years` : "Age"}</span>
-              </div>
-              <div className="flex items-center text-xs text-gray-600">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3 text-gray-400 mr-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{state.city && state.state ? `${state.city}, ${state.state}` : "Location"}</span>
-              </div>
-              <div className="absolute top-3 md:top-4 right-3 md:right-4 bg-green-500 text-white px-2 py-1 rounded text-xs md:text-sm font-semibold">
-                $$
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Terms and Conditions */}
       <div className="mb-12">
         <div className="flex flex-row items-start gap-4 mb-6">
           <div className="flex items-center gap-2 min-w-[120px] justify-center">
-            <span className="text-gray-700 font-medium text-sm">No</span>
-            <Switch
-              checked={state.termsAccepted}
-              onCheckedChange={handleTermsChange}
-              id="terms-switch"
-              className="mx-2 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300"
-            />
-            <span className="text-primary font-medium text-sm">Yes</span>
+            <div 
+              className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors cursor-pointer ${
+                state.termsAccepted 
+                  ? "bg-[#007bff]" 
+                  : "bg-gray-200 border border-[#007bff]"
+              }`}
+              onClick={() => handleTermsChange(!state.termsAccepted)}
+            >
+              <span
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform shadow-sm ${
+                  state.termsAccepted ? "translate-x-8" : "translate-x-0"
+                }`}
+              >
+                {state.termsAccepted ? (
+                  <span className="text-[#007bff] text-xs font-medium">Yes</span>
+                ) : (
+                  <span className="text-gray-500 text-xs font-medium">No</span>
+                )}
+              </span>
+            </div>
           </div>
           <div className="flex-1 mt-1">
             <Label htmlFor="terms-switch" className="text-gray-600 text-xs cursor-pointer leading-snug">
@@ -173,11 +88,11 @@ export default function AdFormStep3() {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-between mt-8">
         <Button
           type="button"
           onClick={goToPreviousStep}
-          className="px-12 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-lg"
+          className="bg-[#1f2937] text-white font-bold text-lg rounded-[4px] px-10 py-5 hover:bg-black border border-gray-700"
           disabled={isSubmitting}
         >
           Previous
@@ -185,7 +100,7 @@ export default function AdFormStep3() {
         <Button
           type="button"
           onClick={handleSubmit}
-          className="px-12 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition text-lg"
+          className="bg-[#007bff] text-white font-bold text-lg rounded-[4px] px-10 py-5 hover:bg-blue-700 border border-blue-600"
           disabled={isSubmitting || !state.termsAccepted}
         >
           {isSubmitting ? (

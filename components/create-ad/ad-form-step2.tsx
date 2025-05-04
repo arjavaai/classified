@@ -102,20 +102,26 @@ export default function AdFormStep2() {
       <h2 className="text-3xl font-semibold text-center mb-2">Add Images</h2>
       <p className="text-gray-500 text-center mb-8">(Add up to 10 pictures, Max file size: 2MB)</p>
 
-      {/* Drop Area */}
+      {/* Drop Area with Image Preview Grid Inside */}
       <div
         className={
-          "border-2 border-dashed rounded-lg p-12 text-center mb-8 cursor-pointer transition-colors border-primary bg-blue-50"
+          "border-4 border-dashed rounded-none p-6 text-center mb-8 transition-colors border-blue-500 bg-white" +
+          (dragActive ? " border-primary bg-blue-50" : "")
         }
-        onClick={() => fileInputRef.current?.click()}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <Upload className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-        <p className="text-xl text-gray-700 mb-2">Drag and drop files here or click to upload.</p>
-        <p className="text-gray-500 text-sm mb-4">or</p>
-        <Button className="bg-primary hover:bg-primary/90">Browse Files</Button>
+        {/* Only show this text when no images are uploaded */}
+        {state.photos.length === 0 && uploadingPhotos.length === 0 && (
+          <div 
+            className="cursor-pointer py-8"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <p className="text-lg text-gray-700 mb-2">Drag and drop files here or click to upload.</p>
+          </div>
+        )}
+        
         <input
           type="file"
           ref={fileInputRef}
@@ -124,58 +130,59 @@ export default function AdFormStep2() {
           className="hidden"
           onChange={handleFileChange}
         />
-      </div>
-
-      {/* Photo Preview Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
-        {/* Uploading images with progress */}
-        {uploadingPhotos.map((item, idx) => (
-          <div key={item.url} className="relative aspect-square rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
-            <img src={item.url} alt="Uploading" className="w-full h-full object-cover opacity-60" />
-            {/* Progress overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-40">
-              <svg className="w-12 h-12 mb-2" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="16" fill="none" stroke="#3b82f6" strokeWidth="4" opacity="0.2" />
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="16"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="4"
-                  strokeDasharray={100}
-                  strokeDashoffset={100 - item.progress}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span className="text-white font-semibold">{item.progress}%</span>
-            </div>
+        
+        {/* Photo Preview Grid - Inside the drop area */}
+        {(uploadingPhotos.length > 0 || state.photos.length > 0) && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+            {/* Uploading images with progress */}
+            {uploadingPhotos.map((item, idx) => (
+              <div key={item.url} className="flex flex-col items-center">
+                <div className="relative aspect-square rounded-lg overflow-hidden w-full">
+                  <img src={item.url} alt="Uploading" className="w-full h-full object-cover" />
+                  {/* Horizontal progress bar overlay - centered and white */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="w-3/4">
+                      <div className="h-3 bg-gray-200 bg-opacity-70 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-white rounded-full" 
+                          style={{ width: `${item.progress}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-center mt-1 text-white font-medium">{item.progress}%</div>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  className="mt-2 text-sm text-gray-700 hover:text-red-500"
+                  onClick={() => {
+                    setUploadingPhotos((prev) => prev.filter((photo) => photo.url !== item.url));
+                    URL.revokeObjectURL(item.url);
+                  }}
+                >
+                  Cancel upload
+                </button>
+              </div>
+            ))}
+            {/* Uploaded images with tick */}
+            {state.photos.map((photo, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div className="relative aspect-square rounded-lg overflow-hidden w-full">
+                  <img src={photo || "/placeholder.svg"} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+                  {/* Large white checkmark in the middle of the image */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                    <CheckCircle className="w-14 h-14 text-white" />
+                  </div>
+                </div>
+                <button
+                  className="mt-2 text-sm text-gray-700 hover:text-red-500"
+                  onClick={() => removePhoto(index)}
+                >
+                  Remove file
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-        {/* Uploaded images with tick */}
-        {state.photos.map((photo, index) => (
-          <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-            <img src={photo || "/placeholder.svg"} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-            {/* Tick overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <CheckCircle className="w-14 h-14 text-primary bg-white rounded-full shadow-lg opacity-60" />
-            </div>
-            {/* Remove button on hover */}
-            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Button
-                variant="destructive"
-                size="icon"
-                className="rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  removePhoto(index)
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
+        )}
       </div>
 
       {/* Navigation Buttons */}
@@ -183,14 +190,14 @@ export default function AdFormStep2() {
         <Button
           type="button"
           onClick={goToPreviousStep}
-          className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+          className="bg-[#1f2937] text-white font-bold text-lg rounded-[4px] px-10 py-5 hover:bg-black border border-gray-700"
         >
           Previous
         </Button>
         <Button
           type="button"
           onClick={goToNextStep}
-          className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+          className="bg-[#007bff] text-white font-bold text-lg rounded-[4px] px-10 py-5 hover:bg-blue-700 border border-blue-600"
         >
           Next
         </Button>
