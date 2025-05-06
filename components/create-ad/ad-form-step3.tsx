@@ -12,6 +12,8 @@ export default function AdFormStep3() {
 
   const goToPreviousStep = () => {
     dispatch({ type: "SET_STEP", payload: 2 })
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleTermsChange = (checked: boolean) => {

@@ -37,7 +37,6 @@ const services = [
   "Anal",
   "BDSM",
   "Girlfriend experience",
-  "Porn activities",
   "Body ejaculation",
   "Erotic massage",
   "Tantric massage",

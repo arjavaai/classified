@@ -86,6 +86,8 @@ export default function AdFormStep2() {
 
   const goToPreviousStep = () => {
     dispatch({ type: "SET_STEP", payload: 1 })
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const goToNextStep = () => {
@@ -95,6 +97,8 @@ export default function AdFormStep2() {
     }
 
     dispatch({ type: "SET_STEP", payload: 3 })
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (

@@ -17,19 +17,28 @@ export default function SearchForm() {
     }
   }
 
+  const handleInputClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    openModal()
+  }
+
   return (
     <>
       <form onSubmit={handleSearch} className="flex items-center w-full">
         <div className="bg-white rounded-lg shadow-sm flex items-center w-full">
-          <div className="flex-1 flex items-center pl-6 py-1">
+          <div 
+            className="flex-1 flex items-center pl-6 py-1 cursor-pointer"
+            onClick={handleInputClick}
+          >
             <Search className="h-6 w-6 text-black mr-3" />
             <input
               type="text"
               placeholder="Search by City"
-              className="w-full py-4 border-none focus:outline-none text-base text-black font-medium"
+              className="w-full py-4 border-none focus:outline-none text-base text-black font-medium cursor-pointer"
               value={filters.searchText}
               onChange={(e) => dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value })}
-              onClick={openModal}
+              readOnly // Make it read-only to prevent keyboard from showing on mobile
             />
           </div>
           <button

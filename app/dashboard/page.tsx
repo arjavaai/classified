@@ -12,13 +12,14 @@ export const metadata: Metadata = {
 
 export default function Dashboard() {
   return (
-    <div className="bg-white">
+    <div className="flex flex-col min-h-screen">
       {/* Full-width header */}
       <div className="w-full bg-white">
         <Header />
       </div>
       
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Full-width dashboard with no padding */}
+      <div className="flex-grow">
         <ProtectedRoute requireVerified={true}>
           <DashboardPage />
         </ProtectedRoute>

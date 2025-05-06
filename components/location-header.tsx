@@ -6,7 +6,11 @@ import Image from "next/image"
 import { Menu, X, Twitter, Instagram, ChevronDown, LogOut, Settings, User } from "lucide-react"
 import { useAuth } from "@/lib/context/auth-context"
 
-export default function Header() {
+interface LocationHeaderProps {
+  locationName?: string;
+}
+
+export default function LocationHeader({ locationName }: LocationHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const { user, signOut } = useAuth()
@@ -78,7 +82,9 @@ export default function Header() {
                 className="h-auto"
                 priority
               />
-              <span className="text-sm font-bold text-gray-700 mt-1">United States</span>
+              <span className="text-sm font-bold text-gray-700 mt-1">
+                United States{locationName ? <span> - <span className="text-gray-500">{locationName}</span></span> : ''}
+              </span>
             </Link>
           </div>
           

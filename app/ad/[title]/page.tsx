@@ -19,19 +19,20 @@ import {
   Menu,
   User,
   Twitter,
-  Instagram
+  Instagram,
+  Share2
 } from "lucide-react"
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import { WhatsAppIcon, EmailIcon, PhoneIcon } from "@/lib/icons"
 import { contactInfo } from "@/lib/config"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Pagination, Autoplay, FreeMode } from "swiper/modules"
 import { sampleAds } from "@/lib/ads-data"
 import { getStateUrl, getCityUrl } from "@/lib/route-utils"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/context/auth-context"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation, Pagination, Autoplay, FreeMode } from "swiper/modules"
 
 // Import Swiper styles
 import "swiper/css"
@@ -219,13 +220,18 @@ export default function AdPage({ params }: { params: { title: string } }) {
               {listing?.location.state} Escorts
             </Link>
             <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-            <span className="text-accent-blue font-medium">{listing?.location.city} Escorts</span>
+            <Link 
+              href={getCityUrl(stateSlug, citySlug)} 
+              className="text-accent-blue font-medium hover:text-primary"
+            >
+              {listing?.location.city} Escorts
+            </Link>
           </div>
           
           {/* Back Button */}
           <button 
             onClick={handleBackClick} 
-            className="flex items-center text-gray-600 hover:text-primary mb-4"
+            className="flex items-center text-accent-blue font-bold hover:text-primary mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to search
@@ -295,7 +301,7 @@ export default function AdPage({ params }: { params: { title: string } }) {
               nextEl: '.swiper-button-next',
               prevEl: '.swiper-button-prev',
             }}
-            onSlideChange={(swiper) => setActiveSlide(swiper.activeIndex)}
+            onSlideChange={(swiper: any) => setActiveSlide(swiper.activeIndex)}
             className="full-width-gallery"
           >
             {galleryImages.map((image, index) => (
@@ -316,15 +322,15 @@ export default function AdPage({ params }: { params: { title: string } }) {
                 </div>
               </SwiperSlide>
             ))}
+            
+            {/* Custom Navigation Arrows - Inside Swiper */}
+            <div className="swiper-button-prev custom-prev" slot="button-prev">
+              <ChevronLeft className="text-white w-6 h-6" />
+            </div>
+            <div className="swiper-button-next custom-next" slot="button-next">
+              <ChevronRight className="text-white w-6 h-6" />
+            </div>
           </Swiper>
-          
-          {/* Custom Navigation Arrows */}
-          <div className="swiper-button-prev custom-prev">
-            <ChevronLeft className="text-white w-6 h-6" />
-          </div>
-          <div className="swiper-button-next custom-next">
-            <ChevronRight className="text-white w-6 h-6" />
-          </div>
           
           {/* Blue progress bar */}
           <div className="gallery-progress-bar"></div>
@@ -346,31 +352,34 @@ export default function AdPage({ params }: { params: { title: string } }) {
                 </p>
 
                 {/* Personal Details Section */}
-                <div className="mt-5 border-t border-gray-100 pt-4">
-                  <h3 className="text-lg font-semibold mb-3">Personal Details</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
-                        <Calendar className="text-primary mr-2 h-4 w-4" /> Age
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-2 flex items-center">
+                    <User className="w-5 h-5 mr-2 text-black" />
+                    Personal Details
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
+                        <Calendar className="text-black mr-2 h-4 w-4" /> Age
                       </div>
                       <div className="text-gray-700">{listing.age} years</div>
                     </div>
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
-                        <Globe className="text-primary mr-2 h-4 w-4" /> Ethnicity
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
+                        <Globe className="text-black mr-2 h-4 w-4" /> Ethnicity
                       </div>
                       <div className="text-gray-700">Asian</div>
                     </div>
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
-                        <Ruler className="text-primary mr-2 h-4 w-4" /> Body Type
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
+                        <Globe className="text-black mr-2 h-4 w-4" /> Nationality
                       </div>
-                      <div className="text-gray-700">Petite</div>
+                      <div className="text-gray-700">{listing.nationality || "Not specified"}</div>
                     </div>
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
                         <svg 
-                          className="text-primary mr-2 h-4 w-4"
+                          className="text-black mr-2 h-4 w-4"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -385,10 +394,10 @@ export default function AdPage({ params }: { params: { title: string } }) {
                       </div>
                       <div className="text-gray-700">Natural C</div>
                     </div>
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
                         <svg 
-                          className="text-primary mr-2 h-4 w-4"
+                          className="text-black mr-2 h-4 w-4"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -403,80 +412,119 @@ export default function AdPage({ params }: { params: { title: string } }) {
                       </div>
                       <div className="text-gray-700">Long Black</div>
                     </div>
-                    <div className="border-b border-gray-100 pb-4 mb-4">
-                      <div className="flex items-center text-gray-700 font-medium mb-2">
-                        <Ruler className="text-primary mr-2 h-4 w-4" /> Height
+                    <div className="border-b border-gray-100 pb-2 mb-2">
+                      <div className="flex items-center text-black font-bold mb-1">
+                        <Ruler className="text-black mr-2 h-4 w-4" /> Body Type
                       </div>
-                      <div className="text-gray-700">5'7" (170cm)</div>
+                      <div className="text-gray-700">{listing.bodyType || "Petite"}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Services Section */}
-                <div className="mt-5 border-t border-gray-100 pt-4">
-                  <h3 className="text-lg font-semibold mb-3">Services</h3>
-                  <div className="flex flex-wrap mt-2">
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                      <path d="M2 17l10 5 10-5"></path>
+                      <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    Services
+                  </h3>
+                  <div className="flex flex-wrap mt-1">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Girlfriend experience
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Massage
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Role play
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Dinner dates
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Travel companion
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Events
                     </span>
                   </div>
                 </div>
 
                 {/* Caters To Section */}
-                <div className="mt-5 border-t border-gray-100 pt-4">
-                  <h3 className="text-lg font-semibold mb-3">Caters To</h3>
-                  <div className="flex items-center">
-                    <Users className="text-primary mr-2 h-4 w-4" />
-                    <div className="text-gray-700">Men, Women, Couples</div>
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-2 flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-black" />
+                    Caters To
+                  </h3>
+                  <div className="flex flex-wrap mt-1">
+                    {listing.catersTo && listing.catersTo.length > 0 ? (
+                      listing.catersTo.map((item: string, index: number) => (
+                        <span key={index} className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          {item}
+                        </span>
+                      ))
+                    ) : (
+                      <>
+                        <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          Men
+                        </span>
+                        <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          Women
+                        </span>
+                        <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          Couples
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 {/* Place of Service Section */}
-                <div className="mt-5 border-t border-gray-100 pt-4">
-                  <h3 className="text-lg font-semibold mb-3">Place of Service</h3>
-                  <div className="flex flex-wrap">
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-2 flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-black" />
+                    Place of Service
+                  </h3>
+                  <div className="flex flex-wrap mt-1">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       At home
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Events and parties
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Hotel / Motel
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Clubs
                     </span>
-                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-md text-sm mr-2 mb-2">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       Outcall
                     </span>
                   </div>
-                  <div className="mt-3">
-                    <div className="flex items-center text-gray-700 font-medium mb-2">
-                      <MapPin className="text-primary mr-2 h-4 w-4" /> Location
-                    </div>
-                    <div className="text-gray-700">{listing.location.city} / {listing.location.area}</div>
+                </div>
+                
+                {/* Location Section */}
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-2 flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-black" />
+                    Location
+                  </h3>
+                  <div className="flex flex-wrap mt-1">
+                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                      {listing.location.city}
+                    </span>
                   </div>
                 </div>
                 
                 {/* Mobile Contact Information - Only visible on mobile */}
                 <div id="contact-info-section-mobile" className="mt-5 border-t border-gray-100 pt-4 md:hidden">
-                  <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+                  <h2 className="text-xl font-bold mb-4">Contact Information</h2>
+
+                  {/* Contact Buttons */}
                   <div className="space-y-3">
                     <Link
                       href={`tel:${contactInfo.phone}`}
@@ -494,10 +542,42 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     </Link>
                     <Link
                       href={`mailto:${contactInfo.email}`}
-                      className="block w-full bg-gray-200 text-gray-700 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition"
+                      className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
                     >
-                      <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Message
+                      <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
                     </Link>
+                  </div>
+                  
+                  {/* Report and Share Section - Mobile */}
+                  <div className="mt-5 pt-3 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <Link 
+                        href={`mailto:support@skulva.com?subject=Report Spam - Ad ID: ${listing.id}&body=I would like to report ad ID: ${listing.id} as spam or inappropriate content.`} 
+                        className="text-red-500 font-medium underline"
+                      >
+                        Report a Spam
+                      </Link>
+                      <div className="flex items-center">
+                        <Share2 className="mr-2 text-gray-700 w-4 h-4" />
+                        <span className="mr-2 text-gray-700">Share ad</span>
+                        <Link 
+                          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(`Check out this escort ad: ${listing.title}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer" 
+                          className="mx-1 bg-black rounded-full w-8 h-8 flex items-center justify-center"
+                        >
+                          <X className="text-white w-4 h-4" />
+                        </Link>
+                        <Link 
+                          href={`https://wa.me/?text=${encodeURIComponent(`Check out this escort ad: ${listing.title} ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mx-1 bg-green-500 rounded-full w-8 h-8 flex items-center justify-center"
+                        >
+                          <WhatsAppIcon className="text-white w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -527,10 +607,42 @@ export default function AdPage({ params }: { params: { title: string } }) {
                   </Link>
                   <Link
                     href={`mailto:${contactInfo.email}`}
-                    className="block w-full bg-gray-200 text-gray-700 text-center font-semibold py-3 px-4 rounded-md hover:bg-gray-300 transition"
+                    className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
                   >
-                    <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Message
+                    <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
                   </Link>
+                </div>
+                
+                {/* Report and Share Section - Desktop */}
+                <div className="mt-5 pt-3 border-t border-gray-100">
+                  <div className="flex flex-col">
+                    <Link 
+                      href={`mailto:support@skulva.com?subject=Report Spam - Ad ID: ${listing.id}&body=I would like to report ad ID: ${listing.id} as spam or inappropriate content.`} 
+                      className="text-red-500 font-medium underline text-center mb-3"
+                    >
+                      Report a Spam
+                    </Link>
+                    <div className="flex items-center justify-center">
+                      <Share2 className="mr-2 text-gray-700 w-4 h-4" />
+                      <span className="mr-2 text-gray-700">Share ad</span>
+                      <Link 
+                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(`Check out this escort ad: ${listing.title}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer" 
+                        className="mx-1 bg-black rounded-full w-8 h-8 flex items-center justify-center"
+                      >
+                        <X className="text-white w-4 h-4" />
+                      </Link>
+                      <Link 
+                        href={`https://wa.me/?text=${encodeURIComponent(`Check out this escort ad: ${listing.title} ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mx-1 bg-green-500 rounded-full w-8 h-8 flex items-center justify-center"
+                      >
+                        <WhatsAppIcon className="text-white w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -582,7 +694,7 @@ export default function AdPage({ params }: { params: { title: string } }) {
             </Link>
             <Link
               href={`mailto:${contactInfo.email}`}
-              className="w-12 h-12 bg-gray-200 text-gray-700 flex items-center justify-center rounded-md"
+              className="w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center rounded-md"
             >
               <EmailIcon className="h-5 w-5" />
             </Link>
