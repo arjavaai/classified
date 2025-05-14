@@ -1,6 +1,7 @@
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, Auth } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, Firestore } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, Firestore, addDoc, serverTimestamp } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 
 // Firebase configuration with fallback to hardcoded values
@@ -125,6 +126,51 @@ const generateUniqueCustomerId = async (): Promise<string> => {
   return customerId;
 };
 
+// Generate a unique ad ID (10 characters alphanumeric with prefix)
+const generateUniqueAdId = async (): Promise<string> => {
+  if (!db) {
+    console.error("Firestore not initialized");
+    return "AD" + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+  }
+  
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking characters like 0, O, 1, I
+  let adId: string = '';
+  let isUnique = false;
+  
+  // Keep generating until we find a unique ID
+  while (!isUnique) {
+    // Start with 'AD' prefix
+    adId = 'AD';
+    
+    // Generate 8 more characters for the ID
+    for (let i = 0; i < 8; i++) {
+      adId += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    console.log(`Generated ad ID candidate: ${adId}`);
+    
+    // Check if this ID already exists in the database
+    try {
+      const adQuery = query(collection(db, "ads"), where("adId", "==", adId));
+      const querySnapshot = await getDocs(adQuery);
+      
+      if (querySnapshot.empty) {
+        // No matching document found, so this ID is unique
+        isUnique = true;
+        console.log(`Ad ID ${adId} is unique and will be used`);
+      } else {
+        console.log(`Ad ID ${adId} already exists, generating a new one`);
+      }
+    } catch (error) {
+      console.error("Error checking ad ID uniqueness:", error);
+      // In case of error, we'll just assume the ID is unique to avoid infinite loops
+      isUnique = true;
+    }
+  }
+  
+  return adId;
+};
+
 // Authentication functions
 export const signUp = async (email: string, password: string) => {
   if (!auth || !db) {
@@ -217,8 +263,39 @@ export const logOut = async () => {
   }
 };
 
+// Create an ad in Firestore
+export const createAd = async (adData: any) => {
+  if (!db) {
+    console.error("Firebase Firestore not initialized");
+    return { success: false, error: "Firebase Firestore not initialized" };
+  }
+  
+  try {
+    // Generate a unique ad ID
+    const uniqueAdId = await generateUniqueAdId();
+    
+    const adsCollectionRef = collection(db, "ads");
+    const docRef = await addDoc(adsCollectionRef, {
+      ...adData,
+      adId: uniqueAdId, // Add the unique ad ID
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      status: adData.adType === 'premium' ? "active" : "pending"
+    });
+    
+    console.log("Ad created with ID:", docRef.id, "and unique ad ID:", uniqueAdId);
+    return { success: true, adId: docRef.id, uniqueAdId };
+  } catch (error: any) {
+    console.error("Error creating ad:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Export Firebase services
+export const storage = isBrowser ? getStorage() : null;
+
 // Export for debugging
 if (isBrowser) {
-  console.log("Firebase module loaded and exporting auth");
+  console.log("Firebase module loaded and exporting auth and storage");
 }
-export { auth, db };
+export { auth, db, generateUniqueAdId };

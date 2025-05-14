@@ -95,21 +95,30 @@ export default function CityPage({ params }: { params: { state: string; city: st
       
       <div className="max-w-5xl mx-auto px-1 sm:px-4 py-8 w-full">
         {/* Breadcrumb Navigation */}
-        <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap px-2 sm:px-0">
-          <Link href="/" className="text-gray-600 hover:text-primary">
-            Skluva United States
-          </Link>
-          <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-          <Link href={getStateUrl(params.state)} className="text-gray-600 hover:text-primary">
-            {stateName} Escorts
-          </Link>
-          <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-          <Link 
-            href={`/us/escorts/${params.state}/${params.city}`} 
-            className="text-accent-blue font-medium hover:text-primary"
-          >
-            {cityName} Escorts
-          </Link>
+        <div className="breadcrumb text-sm mb-4 px-2 sm:px-0">
+          <div className="grid grid-cols-1 sm:flex sm:items-center sm:flex-wrap">
+            {/* First line on mobile */}
+            <div className="flex items-center w-full mb-1 sm:mb-0 sm:w-auto">
+              <Link href="/" className="text-gray-600 hover:text-primary">
+                Skluva United States
+              </Link>
+              <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
+              <Link href={getStateUrl(params.state)} className="text-gray-600 hover:text-primary">
+                {stateName} Escorts
+              </Link>
+            </div>
+            
+            {/* Second line on mobile */}
+            <div className="flex items-center w-full sm:w-auto">
+              <span className="breadcrumb-divider mx-2 text-gray-600 hidden sm:inline">/</span>
+              <Link 
+                href={`/us/escorts/${params.state}/${params.city}`} 
+                className="text-accent-blue font-medium hover:text-primary"
+              >
+                {cityName} Escorts
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Location Heading */}
@@ -117,52 +126,49 @@ export default function CityPage({ params }: { params: { state: string; city: st
           {cityName} Escorts
         </h1>
 
-        {/* Search Results Date */}
-        <div className="text-sm text-gray-600 mb-4 font-medium px-2 sm:px-0">
-          {new Date().toLocaleDateString("en-US", { day: "2-digit", month: "long" }).toUpperCase()}
-        </div>
-
         {/* Listings */}
         {listings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {paginatedListings.map((listing, index) => (
-              <Link href={getAdUrl(listing.title, listing.id)} key={listing.id} className="block no-underline text-black w-[99%] mx-auto sm:w-full">
-                <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[253px] sm:h-[242px] md:h-[242px] relative">
-                  {index < 2 && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-10">
-                      <Crown className="w-3 h-3 mr-1" />
-                      TOP
-                    </div>
-                  )}
-                  <ImageCarousel 
-                    images={listing.images || [listing.image]} 
-                    photoCount={listing.photoCount}
-                  />
-                  <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="text-accent-blue font-bold text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 leading-tight">{listing.title}</div>
-                      <p className="text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-4 leading-tight sm:leading-normal">{listing.description}</p>
-                    </div>
-                    <div className="mt-auto">
-                      <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-                        <Calendar className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{listing.age} years</span>
+              <div key={listing.id} className="relative w-[99%] mx-auto sm:w-full mb-1 mt-3">
+                {listing.isTop && (
+                  <div className="absolute -top-3 right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20">
+                    <Crown className="w-3 h-3 mr-1" />
+                    TOP
+                  </div>
+                )}
+                <Link href={getAdUrl(listing.title, listing.id)} className="block no-underline text-black">
+                  <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[253px] sm:h-[242px] md:h-[242px] relative">
+                    <ImageCarousel 
+                      images={listing.images || [listing.image]} 
+                      photoCount={listing.photoCount}
+                    />
+                    <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="text-accent-blue font-bold text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 leading-tight">{listing.title}</div>
+                        <p className="text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-4 leading-tight sm:leading-normal">{listing.description}</p>
                       </div>
-                      {listing.nationality && (
+                      <div className="mt-auto">
                         <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-                          <Globe className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                          <span>{listing.nationality}</span>
+                          <Calendar className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span>{listing.age} years</span>
                         </div>
-                      )}
-                      <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                        <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{listing.location.area ? `${listing.location.area}, ${listing.location.city}` : listing.location.city}</span>
+                        {listing.nationality && (
+                          <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                            <Globe className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                            <span>{listing.nationality}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                          <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span>{listing.location.area ? `${listing.location.area}, ${listing.location.city}` : listing.location.city}</span>
+                        </div>
+                        <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
                       </div>
-                      <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         ) : (

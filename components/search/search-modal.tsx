@@ -13,7 +13,7 @@ import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
 
 // Filter options data
 const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
-const nationalities = ["Indian", "South African", "Russian", "Kenyan"]
+const nationalities = ["Indian", "South African", "Russian", "Kenyan", "Others"]
 const allNationalities = [
   "Albanian", "American", "Arabic", "Argentinian", "Australian", "Austrian", 
   "Bangladeshi", "Belgian", "Bolivian", "Bosnian", "Brazilian", "Bulgarian", 
@@ -224,7 +224,9 @@ export default function SearchModal() {
 
           {/* Price Range Slider */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium mb-2">Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}</h3>
+            <div className="w-full text-left">
+              <h3 className="text-sm font-medium mb-2">Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1] === 1000 ? '1000+' : filters.priceRange[1]}</h3>
+            </div>
             <Slider
               defaultValue={[0, 1000]}
               min={0}
@@ -269,7 +271,7 @@ export default function SearchModal() {
                 onClick={() => dispatch({ type: "CLEAR_ALL" })}
                 className="text-primary hover:text-primary-dark font-medium"
               >
-                All Clear
+                
               </button>
             </div>
 
@@ -481,9 +483,17 @@ export default function SearchModal() {
           </div>
         </div>
 
-        {/* Footer with Search Button */}
+        {/* Footer with Clear All and Search Buttons */}
         <div className="sticky bottom-0 bg-white border-t p-4 px-6 mt-auto">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => {
+                dispatch({ type: "CLEAR_ALL" });
+              }}
+              className="bg-white text-gray-700 font-medium rounded-[4px] px-6 py-4 hover:bg-gray-100 border border-gray-300"
+            >
+              All Clear
+            </button>
             <button
               onClick={handleSearch}
               className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600"

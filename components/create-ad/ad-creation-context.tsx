@@ -14,12 +14,13 @@ export type AdFormData = {
   email: string
   phone: string
   whatsapp: boolean
+  sms: boolean
   state: string
   city: string
   title: string
   description: string
   ethnicity: string[]
-  nationality: string
+  nationality: string[]
   bodyType: string[]
   breastType: string[]
   hairColor: string[]
@@ -60,12 +61,13 @@ const initialState: AdFormData = {
   email: "",
   phone: "",
   whatsapp: false,
+  sms: false,
   state: "",
   city: "",
   title: "",
   description: "",
   ethnicity: [],
-  nationality: "",
+  nationality: [],
   bodyType: [],
   breastType: [],
   hairColor: [],
@@ -81,7 +83,7 @@ const initialState: AdFormData = {
     "12": "",
     "24": "",
     "48": "",
-    additional24: "",
+    "overnight": "",
   },
   outcallRates: {
     "0.5": "",
@@ -92,7 +94,7 @@ const initialState: AdFormData = {
     "12": "",
     "24": "",
     "48": "",
-    additional24: "",
+    "overnight": "",
   },
   photos: [],
   termsAccepted: false,

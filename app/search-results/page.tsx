@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, MapPin } from "lucide-react"
+import { Calendar, MapPin, Crown } from "lucide-react"
 import Header from "@/components/header"
 import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
@@ -143,31 +143,39 @@ export default function SearchResultsPage() {
         {filteredListings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {filteredListings.map((listing) => (
-              <Link href={getAdUrl(listing.title, listing.id)} key={listing.id} className="block no-underline text-black">
-                <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[220px]">
-                  <ImageCarousel 
-                    images={listing.images || [listing.image]} 
-                    photoCount={listing.photoCount}
-                  />
-                  <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="text-accent-blue font-bold text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 leading-tight">{listing.title}</div>
-                      <p className="text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-4 leading-tight sm:leading-normal">{listing.description}</p>
-                    </div>
-                    <div className="mt-auto">
-                      <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-                        <Calendar className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{listing.age} years</span>
+              <div key={listing.id} className="relative w-[99%] mx-auto sm:w-full mb-1 mt-3">
+                {listing.isTop && (
+                  <div className="absolute -top-3 right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20">
+                    <Crown className="w-3 h-3 mr-1" />
+                    TOP
+                  </div>
+                )}
+                <Link href={getAdUrl(listing.title, listing.id)} className="block no-underline text-black">
+                  <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[220px]">
+                    <ImageCarousel 
+                      images={listing.images || [listing.image]} 
+                      photoCount={listing.photoCount}
+                    />
+                    <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="text-accent-blue font-bold text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 leading-tight">{listing.title}</div>
+                        <p className="text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-4 leading-tight sm:leading-normal">{listing.description}</p>
                       </div>
-                      <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                        <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{listing.location}</span>
+                      <div className="mt-auto">
+                        <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                          <Calendar className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span>{listing.age} years</span>
+                        </div>
+                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                          <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
+                          <span>{listing.location}</span>
+                        </div>
+                        <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
                       </div>
-                      <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         ) : (

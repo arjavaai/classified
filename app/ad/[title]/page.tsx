@@ -211,21 +211,30 @@ export default function AdPage({ params }: { params: { title: string } }) {
       <div className="bg-white">
         <div className="max-w-5xl mx-auto px-4 py-8">
           {/* Breadcrumb Navigation */}
-          <div className="breadcrumb text-sm mb-4 overflow-x-auto whitespace-nowrap">
-            <Link href="/" className="text-gray-600 hover:text-primary">
-              Skluva United States
-            </Link>
-            <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-            <Link href={getStateUrl(listing?.location.stateAbbreviation)} className="text-gray-600 hover:text-primary">
-              {listing?.location.state} Escorts
-            </Link>
-            <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-            <Link 
-              href={getCityUrl(stateSlug, citySlug)} 
-              className="text-accent-blue font-medium hover:text-primary"
-            >
-              {listing?.location.city} Escorts
-            </Link>
+          <div className="breadcrumb text-sm mb-4 px-2 sm:px-0">
+            <div className="grid grid-cols-1 sm:flex sm:items-center sm:flex-wrap">
+              {/* First line on mobile */}
+              <div className="flex items-center w-full mb-1 sm:mb-0 sm:w-auto">
+                <Link href="/" className="text-gray-600 hover:text-primary">
+                  Skluva United States
+                </Link>
+                <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
+                <Link href={getStateUrl(listing?.location.stateAbbreviation)} className="text-gray-600 hover:text-primary">
+                  {listing?.location.state} Escorts
+                </Link>
+              </div>
+              
+              {/* Second line on mobile */}
+              <div className="flex items-center w-full sm:w-auto">
+                <span className="breadcrumb-divider mx-2 text-gray-600 hidden sm:inline">/</span>
+                <Link 
+                  href={getCityUrl(stateSlug, citySlug)} 
+                  className="text-accent-blue font-medium hover:text-primary"
+                >
+                  {listing?.location.city} Escorts
+                </Link>
+              </div>
+            </div>
           </div>
           
           {/* Back Button */}
@@ -420,6 +429,8 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     </div>
                   </div>
                 </div>
+                
+
 
                 {/* Services Section */}
                 <div className="mt-4 border-t border-gray-100 pt-3">
@@ -517,6 +528,87 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
                       {listing.location.city}
                     </span>
+                  </div>
+                </div>
+                
+                {/* Rates Section */}
+                <div className="mt-4 border-t border-gray-100 pt-3">
+                  <h3 className="text-lg font-bold mb-3 flex items-center">
+                    <svg 
+                      className="w-5 h-5 mr-2 text-black" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Rates
+                  </h3>
+                  
+                  <div className="overflow-hidden rounded-lg border border-black mb-4">
+                    {/* Header Row */}
+                    <div className="bg-blue-600 text-white grid grid-cols-3 text-center font-medium">
+                      <div className="p-2 border-r border-white/20">Time</div>
+                      <div className="p-2 border-r border-white/20">Incall</div>
+                      <div className="p-2">Outcall</div>
+                    </div>
+                    
+                    {/* Rate Rows */}
+                    <div className="bg-white">
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">0.5 Hour</div>
+                        <div className="p-2">150 USD</div>
+                        <div className="p-2 flex items-center justify-center">
+                          <X className="h-4 w-4 text-red-500" />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">1 Hour</div>
+                        <div className="p-2">200 USD</div>
+                        <div className="p-2">250 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">2 Hours</div>
+                        <div className="p-2">400 USD</div>
+                        <div className="p-2">500 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">3 Hours</div>
+                        <div className="p-2">600 USD</div>
+                        <div className="p-2">750 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">6 Hours</div>
+                        <div className="p-2">1200 USD</div>
+                        <div className="p-2">1500 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">12 Hours</div>
+                        <div className="p-2">2400 USD</div>
+                        <div className="p-2">3000 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center border-b border-black">
+                        <div className="p-2 text-blue-600 font-medium">24 Hours</div>
+                        <div className="p-2">5000 USD</div>
+                        <div className="p-2">6000 USD</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 text-center">
+                        <div className="p-2 text-blue-600 font-medium">48 Hours</div>
+                        <div className="p-2">10 USD</div>
+                        <div className="p-2">120 USD</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 

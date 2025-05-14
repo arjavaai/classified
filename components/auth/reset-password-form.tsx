@@ -70,7 +70,7 @@ export default function ResetPasswordForm() {
             className="w-full bg-[#007bff] text-white font-medium rounded-[4px] px-12 py-4 hover:bg-blue-700 border border-blue-600"
             disabled={isLoading}
           >
-            {isLoading ? "Sending..." : "Reset Password"}
+            {isLoading ? "Sending..." : "Send Password Reset Link"}
           </Button>
 
           {/* Back to Login */}

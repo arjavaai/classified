@@ -19,16 +19,9 @@ export default function InfoFooter() {
               <span className="text-xs font-bold text-gray-700 mt-1">United States</span>
             </Link>
           </div>
-          
-          <Link
-            href="#"
-            className="bg-[#007bff] text-white font-medium rounded-[4px] px-12 py-3 hover:bg-blue-700 border border-blue-600 inline-block"
-          >
-            Create Ad
-          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           {/* Legal Links */}
           <div>
             <h4 className="font-semibold mb-4 text-gray-800">Legal</h4>
@@ -60,6 +53,13 @@ export default function InfoFooter() {
             </Link>
             <Link href="#" className="block mb-3 text-gray-600 hover:text-primary">
               FAQ
+            </Link>
+            <Link 
+              href="/create-ad" 
+              className="block mb-3 text-[#007bff] hover:text-blue-700 font-medium"
+              data-component-name="LinkComponent"
+            >
+              Create Ad
             </Link>
             <Link href="#" className="flex items-center mt-3 text-gray-600 hover:text-primary">
               Follow us

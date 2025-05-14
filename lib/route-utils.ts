@@ -89,7 +89,7 @@ export function getCityUrl(stateSlug: string, citySlug: string): string {
 /**
  * Generate a URL for an ad using the new format: /ad/{title}/?={id}
  */
-export const getAdUrl = (title: string, id: number): string => {
+export const getAdUrl = (title: string, id: number | string): string => {
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return `/ad/${slug}/?=${id}`;
 };

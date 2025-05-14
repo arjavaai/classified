@@ -43,7 +43,8 @@ export default function SearchForm() {
           </div>
           <button
             type="submit"
-            className="bg-[#007bff] hover:bg-blue-600 text-white px-8 py-2.5 rounded-[4px] font-medium text-base h-[60%] self-center mr-3 border border-blue-600 my-4"
+            className="bg-[#007bff] hover:bg-blue-600 text-white px-4 sm:px-8 py-2 sm:py-2.5 rounded-[4px] font-medium text-base h-[60%] self-center mr-2 sm:mr-3 border border-blue-600 my-4"
+            data-component-name="SearchForm"
           >
             Search
           </button>

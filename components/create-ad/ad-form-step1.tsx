@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { getStates, getCitiesByStateCode } from "@/lib/demo-data"
+import { useAuth } from "@/lib/context/auth-context"
+import { useRouter } from "next/navigation"
+import { AlertCircle } from "lucide-react"
 
 // Import nationality data from search modal
 const ethnicities = ["Arabian", "Asian", "Ebony", "Caucasian", "Hispanic", "Indian", "Latin", "Mixed race", "Others"]
@@ -37,7 +40,6 @@ const services = [
   "Anal",
   "BDSM",
   "Girlfriend experience",
-  "Porn activities",
   "Body ejaculation",
   "Erotic massage",
   "Tantric massage",
@@ -50,19 +52,13 @@ const services = [
 ]
 const catersTo = ["Men", "Women", "Non-binary", "Couples"]
 
-// Define the AdFormData type
-interface AdFormData {
-  name: string
-  age: string
-  title: string
-  description: string
-  state: string
-  city: string
-  category: string
-  contactPreference: "email" | "phone" | "both"
-  email: string
-  phone: string
-  whatsapp: boolean
+// Import AdFormData type from context
+import { AdFormData as AdFormDataType } from "./ad-creation-context"
+
+// Define the local AdFormData interface
+interface AdFormData extends Omit<AdFormDataType, 'step' | 'adType' | 'photos' | 'termsAccepted'> {
+  // Any additional fields specific to this component can be added here
+
   ethnicity: string[]
   nationality: string[]
   bodyType: string[]
@@ -77,8 +73,11 @@ interface AdFormData {
 
 export default function AdFormStep1() {
   const { state, dispatch } = useAdCreation()
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([])
   const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([])
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   // Load states when component mounts
   useEffect(() => {
@@ -88,11 +87,17 @@ export default function AdFormStep1() {
   // Update cities when state changes
   useEffect(() => {
     if (state.state) {
-      setCitiesList(getCitiesByStateCode(state.state))
+      // Find the state abbreviation from the full state name
+      const stateObj = statesList.find(s => s.name === state.state);
+      if (stateObj) {
+        setCitiesList(getCitiesByStateCode(stateObj.abbreviation));
+      } else {
+        setCitiesList([]);
+      }
     } else {
-      setCitiesList([])
+      setCitiesList([]);
     }
-  }, [state.state])
+  }, [state.state, statesList])
 
   const handleChange = (field: keyof AdFormData, value: string | boolean | string[]) => {
     dispatch({
@@ -102,8 +107,15 @@ export default function AdFormStep1() {
   }
 
   const handleStateChange = (value: string) => {
-    handleChange("state", value)
-    handleChange("city", "") // Reset city when state changes
+    // Find the state object by abbreviation to get the full name
+    const stateObj = statesList.find(s => s.abbreviation === value);
+    if (stateObj) {
+      // Store the full state name instead of the abbreviation
+      handleChange("state", stateObj.name);
+    } else {
+      handleChange("state", value);
+    }
+    handleChange("city", ""); // Reset city when state changes
   }
 
   const handleCityChange = (value: string) => {
@@ -140,10 +152,25 @@ export default function AdFormStep1() {
       alert("You must be 18 years or older")
       return
     }
+    
+    // Check if user is logged in
+    if (!loading && !user) {
+      // User is not logged in, show login prompt
+      setShowLoginPrompt(true)
+      return
+    }
 
     dispatch({ type: "SET_STEP", payload: 2 })
     // Scroll to the top of the page
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  
+  const handleRedirectToLogin = () => {
+    // Save the current form state to localStorage before redirecting
+    localStorage.setItem('pendingAdData', JSON.stringify(state))
+    
+    // Redirect to login page
+    router.push('/login')
   }
 
   return (
@@ -255,29 +282,57 @@ export default function AdFormStep1() {
           )}
         </div>
 
-        {/* WhatsApp Option - Only visible when phone is selected */}
+        {/* WhatsApp and SMS Options - Only visible when phone is selected */}
         {(state.contactPreference === "phone" || state.contactPreference === "both") && (
-          <div className="flex items-center space-x-4">
-            <Label className="text-lg">WhatsApp</Label>
-            <div 
-              className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors cursor-pointer ${
-                state.whatsapp 
-                  ? "bg-[#007bff]" 
-                  : "bg-gray-200 border border-[#007bff]"
-              }`}
-              onClick={() => handleChange("whatsapp", !state.whatsapp)}
-            >
-              <span
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform shadow-sm ${
-                  state.whatsapp ? "translate-x-8" : "translate-x-0"
+          <div className="flex flex-wrap items-center gap-6">
+            {/* WhatsApp Toggle */}
+            <div className="flex items-center space-x-4">
+              <Label className="text-lg">WhatsApp</Label>
+              <div 
+                className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors cursor-pointer ${
+                  state.whatsapp 
+                    ? "bg-[#007bff]" 
+                    : "bg-gray-200 border border-[#007bff]"
                 }`}
+                onClick={() => handleChange("whatsapp", !state.whatsapp)}
               >
-                {state.whatsapp ? (
-                  <span className="text-[#007bff] text-xs font-medium">Yes</span>
-                ) : (
-                  <span className="text-gray-500 text-xs font-medium">No</span>
-                )}
-              </span>
+                <span
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform shadow-sm ${
+                    state.whatsapp ? "translate-x-8" : "translate-x-0"
+                  }`}
+                >
+                  {state.whatsapp ? (
+                    <span className="text-[#007bff] text-xs font-medium">Yes</span>
+                  ) : (
+                    <span className="text-gray-500 text-xs font-medium">No</span>
+                  )}
+                </span>
+              </div>
+            </div>
+            
+            {/* SMS Toggle */}
+            <div className="flex items-center space-x-4">
+              <Label className="text-lg">SMS</Label>
+              <div 
+                className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors cursor-pointer ${
+                  state.sms 
+                    ? "bg-[#007bff]" 
+                    : "bg-gray-200 border border-[#007bff]"
+                }`}
+                onClick={() => handleChange("sms", !state.sms)}
+              >
+                <span
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform shadow-sm ${
+                    state.sms ? "translate-x-8" : "translate-x-0"
+                  }`}
+                >
+                  {state.sms ? (
+                    <span className="text-[#007bff] text-xs font-medium">Yes</span>
+                  ) : (
+                    <span className="text-gray-500 text-xs font-medium">No</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         )}
@@ -287,10 +342,10 @@ export default function AdFormStep1() {
           {/* State Field */}
           <div>
             <Label htmlFor="state" className="text-lg mb-2">
-              State <span className="text-red-500">*</span>
+              All Regions<span className="text-red-500">*</span>
             </Label>
             <Select
-              value={state.state}
+              value={statesList.find(s => s.name === state.state)?.abbreviation || ""}
               onValueChange={handleStateChange}
             >
               <SelectTrigger id="state" className="p-4 text-base">
@@ -526,14 +581,38 @@ export default function AdFormStep1() {
           />
         </div>
 
+        {/* Login prompt message */}
+        {showLoginPrompt && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6">
+            <div className="flex items-center mb-2">
+              <AlertCircle className="h-5 w-5 mr-2" />
+              <span className="font-medium">Login Required</span>
+            </div>
+            <p className="mb-3">You need to be logged in to create an ad. Please log in to continue.</p>
+            <button
+              onClick={handleRedirectToLogin}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+            >
+              Go to Login
+            </button>
+          </div>
+        )}
+        
         {/* Navigation Buttons */}
-        <div className="flex justify-end mt-8">
+        <div className="flex justify-between items-center gap-3 mt-8">
+          <button
+            type="button"
+            onClick={() => dispatch({ type: "SET_STEP", payload: 0 })}
+            className="bg-[#1f2937] text-white font-bold rounded-[4px] px-4 py-4 sm:px-8 sm:py-6 hover:bg-black border border-gray-700 flex-1 text-base sm:text-lg min-w-[120px] sm:min-w-[140px] h-auto"
+          >
+            Previous
+          </button>
           <button
             type="button"
             onClick={goToNextStep}
-            className="bg-[#007bff] text-white font-medium rounded-[4px] px-8 py-4 hover:bg-blue-700 border border-blue-600 min-w-[180px]"
+            className="bg-[#007bff] text-white font-bold rounded-[4px] px-4 py-4 sm:px-8 sm:py-6 hover:bg-blue-700 border border-blue-600 flex-1 text-base sm:text-lg min-w-[120px] sm:min-w-[140px] h-auto"
           >
-            Next: Add Photos
+            Next
           </button>
         </div>
       </form>

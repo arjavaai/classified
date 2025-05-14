@@ -5,6 +5,7 @@ import AdFormStep1 from "./ad-form-step1"
 import AdFormStep2 from "./ad-form-step2"
 import AdFormStep3 from "./ad-form-step3"
 import { ChevronRight } from "lucide-react"
+import { useEffect } from "react"
 
 export default function CreateAdForm() {
   return (
@@ -15,8 +16,22 @@ export default function CreateAdForm() {
 }
 
 function AdFormContent() {
-  const { state } = useAdCreation()
+  const { state, dispatch } = useAdCreation()
   const { step } = state
+  
+  // Check if coming from promote-ad page
+  useEffect(() => {
+    const promotedAdType = typeof window !== 'undefined' ? localStorage.getItem('promotedAdType') : null
+    
+    if (promotedAdType) {
+      // Set the ad type from localStorage
+      dispatch({ type: "SET_AD_TYPE", payload: promotedAdType })
+      // Skip to step 1
+      dispatch({ type: "SET_STEP", payload: 1 })
+      // Clear the localStorage item to prevent this from happening on refresh
+      localStorage.removeItem('promotedAdType')
+    }
+  }, [dispatch])
 
   return (
     <>
@@ -37,17 +52,22 @@ function AdFormContent() {
             <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
               {/* Steps Progress inside the card */}
               <div className="p-4 border-b border-gray-100">
-                <div className="flex justify-between items-center max-w-3xl mx-auto relative">
+                <div className="grid grid-cols-3 gap-2 md:flex md:justify-between md:items-center md:gap-8 max-w-3xl mx-auto relative">
                   {/* Step 1 */}
-                  <div className="flex items-center">
-                    <div
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-lg font-bold ${
-                        step >= 1 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
-                      }`}
-                    >
-                      1
+                  <div className="flex flex-col items-center justify-center text-center md:flex-row">
+                    <div className="flex flex-col items-center w-full">
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center text-base md:text-lg font-bold ${
+                          step >= 1 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        1
+                      </div>
+                      <span className={`mt-2 text-xs font-medium ${step >= 1 ? "text-[#007bff]" : "text-gray-500"} md:hidden max-w-[100px] text-center leading-tight whitespace-nowrap`}>
+                      Add information
+                      </span>
                     </div>
-                    <span className={`ml-2 md:ml-3 text-xs md:text-base font-bold ${step >= 1 ? "text-[#007bff]" : "text-gray-500"}`}>
+                    <span className={`ml-0 md:ml-3 text-xs md:text-base font-bold ${step >= 1 ? "text-[#007bff]" : "text-gray-500"} hidden md:block whitespace-nowrap`}>
                       Add information
                     </span>
                   </div>
@@ -56,15 +76,20 @@ function AdFormContent() {
                   <ChevronRight className="h-4 w-4 md:h-6 md:w-6 text-gray-300 hidden md:block" />
 
                   {/* Step 2 */}
-                  <div className="flex items-center">
-                    <div
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-lg font-bold ${
-                        step >= 2 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
-                      }`}
-                    >
-                      2
+                  <div className="flex flex-col items-center justify-center text-center md:flex-row">
+                    <div className="flex flex-col items-center w-full">
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center text-base md:text-lg font-bold ${
+                          step >= 2 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        2
+                      </div>
+                      <span className={`mt-2 text-xs font-medium ${step >= 2 ? "text-[#007bff]" : "text-gray-500"} md:hidden max-w-[100px] text-center leading-tight whitespace-nowrap`}>
+                        Photos
+                      </span>
                     </div>
-                    <span className={`ml-2 md:ml-3 text-xs md:text-base font-bold ${step >= 2 ? "text-[#007bff]" : "text-gray-500"}`}>
+                    <span className={`ml-0 md:ml-3 text-xs md:text-base font-bold ${step >= 2 ? "text-[#007bff]" : "text-gray-500"} hidden md:block whitespace-nowrap`}>
                       Photos
                     </span>
                   </div>
@@ -73,15 +98,20 @@ function AdFormContent() {
                   <ChevronRight className="h-4 w-4 md:h-6 md:w-6 text-gray-300 hidden md:block" />
 
                   {/* Step 3 */}
-                  <div className="flex items-center">
-                    <div
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-lg font-bold ${
-                        step >= 3 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
-                      }`}
-                    >
-                      3
+                  <div className="flex flex-col items-center justify-center text-center md:flex-row">
+                    <div className="flex flex-col items-center w-full">
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center text-base md:text-lg font-bold ${
+                          step >= 3 ? "bg-[#007bff] text-white" : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        3
+                      </div>
+                      <span className={`mt-2 text-xs font-medium ${step >= 3 ? "text-[#007bff]" : "text-gray-500"} md:hidden max-w-[100px] text-center leading-tight whitespace-nowrap`}>
+                        Finish
+                      </span>
                     </div>
-                    <span className={`ml-2 md:ml-3 text-xs md:text-base font-bold ${step >= 3 ? "text-[#007bff]" : "text-gray-500"}`}>
+                    <span className={`ml-0 md:ml-3 text-xs md:text-base font-bold ${step >= 3 ? "text-[#007bff]" : "text-gray-500"} hidden md:block whitespace-nowrap`}>
                       Finish
                     </span>
                   </div>

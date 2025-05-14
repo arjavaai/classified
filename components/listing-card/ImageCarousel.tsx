@@ -59,7 +59,7 @@ export default function ImageCarousel({ images, photoCount }: ImageCarouselProps
         ))}
       </Swiper>
       
-      <div className="absolute bottom-2 left-2 z-20 bg-black bg-opacity-50 px-1.5 py-0.5 rounded text-xs font-medium text-white">
+      <div className="absolute bottom-2 left-2 z-20 bg-black bg-opacity-10 px-1.5 py-0.5 rounded text-xs font-medium text-white">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

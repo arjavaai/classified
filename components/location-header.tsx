@@ -82,8 +82,14 @@ export default function LocationHeader({ locationName }: LocationHeaderProps) {
                 className="h-auto"
                 priority
               />
-              <span className="text-sm font-bold text-gray-700 mt-1">
-                United States{locationName ? <span> - <span className="text-gray-500">{locationName}</span></span> : ''}
+              <span className="text-xs sm:text-sm font-bold text-gray-700 mt-1 flex flex-wrap items-center">
+                <span>United States</span>
+                {locationName && (
+                  <>
+                    <span className="mx-1">-</span>
+                    <span className="text-accent-blue font-semibold text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">{locationName}</span>
+                  </>
+                )}
               </span>
             </Link>
           </div>
