@@ -116,8 +116,8 @@ export default function AdFormStep3() {
       const result = await createAd(adData);
       
       if (result.success) {
-        // Store the unique ad ID
-        setUniqueAdId(result.uniqueAdId || `AD${Date.now().toString().slice(-8)}`);
+        // Store the Firebase document ID
+        setUniqueAdId(result.adId || '');
         
         // Show success message
         setSubmitSuccess(true);

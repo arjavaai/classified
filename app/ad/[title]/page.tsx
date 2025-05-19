@@ -27,7 +27,7 @@ import InfoFooter from "@/components/info-footer"
 import SiteFooter from "@/components/site-footer"
 import { WhatsAppIcon, EmailIcon, PhoneIcon } from "@/lib/icons"
 import { contactInfo } from "@/lib/config"
-import { sampleAds } from "@/lib/ads-data"
+import { fetchAdById, Ad } from "@/lib/ad-utils"
 import { getStateUrl, getCityUrl } from "@/lib/route-utils"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/context/auth-context"
@@ -46,10 +46,12 @@ export default function AdPage({ params }: { params: { title: string } }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [fullscreenActive, setFullscreenActive] = useState(false);
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
-  const [listing, setListing] = useState<any>(null);
+  const [listing, setListing] = useState<Ad | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const adId = searchParams.get("");
+  // Extract the ad ID from the query parameter
+  const adIdParam = searchParams.toString();
+  const adId = adIdParam.split('=')[1]; // Extract the ID after the '=' character
   
   useEffect(() => {
     if (!adId) {
@@ -57,19 +59,35 @@ export default function AdPage({ params }: { params: { title: string } }) {
       return;
     }
 
-    const id = parseInt(adId);
-    const ad = sampleAds.find(ad => ad.id === id);
+    const fetchAd = async () => {
+      try {
+        const ad = await fetchAdById(adId);
+        
+        if (!ad) {
+          console.error(`No ad found with ID: ${adId}`);
+          router.push("/404");
+          return;
+        }
+        
+        console.log('Fetched ad details:', ad);
+        setListing(ad);
+      } catch (error) {
+        console.error('Error fetching ad details:', error);
+        router.push("/404");
+      }
+    };
     
-    if (!ad) {
-      router.push("/404");
-      return;
-    }
-    
-    setListing(ad);
+    fetchAd();
   }, [adId, router]);
   
-  // Image gallery
-  const galleryImages = [
+  // Use photos from the ad fetched from Firebase
+  const galleryImages = listing && listing.photos ? 
+    listing.photos.map(photo => ({
+      src: photo,
+      alt: listing.title || "Ad Image",
+      width: 200
+    })) : [
+    // Fallback images if no photos are available
     {
       src: "/sophisticated-evening.png",
       alt: "Elite Companion",
@@ -82,11 +100,6 @@ export default function AdPage({ params }: { params: { title: string } }) {
     },
     {
       src: "/sapphire-serenity.png",
-      alt: "Elite Companion",
-      width: 150
-    },
-    {
-      src: "/elegant-gaze.png",
       alt: "Elite Companion",
       width: 180
     },
@@ -198,8 +211,8 @@ export default function AdPage({ params }: { params: { title: string } }) {
   }
 
   // Generate state and city URLs for breadcrumb
-  const stateSlug = listing.location.state.toLowerCase().replace(/\s+/g, '-');
-  const citySlug = listing.location.city.toLowerCase().replace(/\s+/g, '-');
+  const stateSlug = listing?.state ? listing.state.toLowerCase().replace(/\s+/g, '-') : '';
+  const citySlug = listing?.city ? listing.city.toLowerCase().replace(/\s+/g, '-') : '';
 
   return (
     <div className="min-h-screen bg-white">
@@ -219,8 +232,8 @@ export default function AdPage({ params }: { params: { title: string } }) {
                   Skluva United States
                 </Link>
                 <span className="breadcrumb-divider mx-2 text-gray-600">/</span>
-                <Link href={getStateUrl(listing?.location.stateAbbreviation)} className="text-gray-600 hover:text-primary">
-                  {listing?.location.state} Escorts
+                <Link href={getStateUrl(stateSlug)} className="text-gray-600 hover:text-primary">
+                  {listing?.state} Escorts
                 </Link>
               </div>
               
@@ -231,7 +244,7 @@ export default function AdPage({ params }: { params: { title: string } }) {
                   href={getCityUrl(stateSlug, citySlug)} 
                   className="text-accent-blue font-medium hover:text-primary"
                 >
-                  {listing?.location.city} Escorts
+                  {listing?.city} Escorts
                 </Link>
               </div>
             </div>
@@ -377,13 +390,29 @@ export default function AdPage({ params }: { params: { title: string } }) {
                       <div className="flex items-center text-black font-bold mb-1">
                         <Globe className="text-black mr-2 h-4 w-4" /> Ethnicity
                       </div>
-                      <div className="text-gray-700">Asian</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(listing?.ethnicity) ? (
+                          listing.ethnicity.map((item, index) => (
+                            <div key={index}>{item}</div>
+                          ))
+                        ) : (
+                          listing?.ethnicity || 'Not specified'
+                        )}
+                      </div>
                     </div>
                     <div className="border-b border-gray-100 pb-2 mb-2">
                       <div className="flex items-center text-black font-bold mb-1">
                         <Globe className="text-black mr-2 h-4 w-4" /> Nationality
                       </div>
-                      <div className="text-gray-700">{listing.nationality || "Not specified"}</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(listing?.nationality) ? (
+                          listing.nationality.map((item, index) => (
+                            <div key={index}>{item}</div>
+                          ))
+                        ) : (
+                          listing?.nationality || 'Not specified'
+                        )}
+                      </div>
                     </div>
                     <div className="border-b border-gray-100 pb-2 mb-2">
                       <div className="flex items-center text-black font-bold mb-1">
@@ -401,7 +430,15 @@ export default function AdPage({ params }: { params: { title: string } }) {
                         </svg>
                         Breast
                       </div>
-                      <div className="text-gray-700">Natural C</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(listing?.breastType) ? (
+                          listing.breastType.map((item, index) => (
+                            <div key={index}>{item}</div>
+                          ))
+                        ) : (
+                          listing?.breastType || 'Not specified'
+                        )}
+                      </div>
                     </div>
                     <div className="border-b border-gray-100 pb-2 mb-2">
                       <div className="flex items-center text-black font-bold mb-1">
@@ -419,13 +456,29 @@ export default function AdPage({ params }: { params: { title: string } }) {
                         </svg>
                         Hair
                       </div>
-                      <div className="text-gray-700">Long Black</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(listing?.hairColor) ? (
+                          listing.hairColor.map((item, index) => (
+                            <div key={index}>{item}</div>
+                          ))
+                        ) : (
+                          listing?.hairColor || 'Not specified'
+                        )}
+                      </div>
                     </div>
                     <div className="border-b border-gray-100 pb-2 mb-2">
                       <div className="flex items-center text-black font-bold mb-1">
                         <Ruler className="text-black mr-2 h-4 w-4" /> Body Type
                       </div>
-                      <div className="text-gray-700">{listing.bodyType || "Petite"}</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(listing?.bodyType) ? (
+                          listing.bodyType.map((item, index) => (
+                            <div key={index}>{item}</div>
+                          ))
+                        ) : (
+                          listing?.bodyType || 'Not specified'
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -443,24 +496,15 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     Services
                   </h3>
                   <div className="flex flex-wrap mt-1">
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Girlfriend experience
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Massage
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Role play
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Dinner dates
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Travel companion
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Events
-                    </span>
+                    {listing?.services && listing.services.length > 0 ? (
+                      listing.services.map((service: string, index: number) => (
+                        <span key={index} className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          {service}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500">No services listed</span>
+                    )}
                   </div>
                 </div>
 
@@ -500,21 +544,15 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     Place of Service
                   </h3>
                   <div className="flex flex-wrap mt-1">
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      At home
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Events and parties
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Hotel / Motel
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Clubs
-                    </span>
-                    <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      Outcall
-                    </span>
+                    {listing?.placeOfService && listing.placeOfService.length > 0 ? (
+                      listing.placeOfService.map((place: string, index: number) => (
+                        <span key={index} className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
+                          {place}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500">No place of service specified</span>
+                    )}
                   </div>
                 </div>
                 
@@ -526,7 +564,7 @@ export default function AdPage({ params }: { params: { title: string } }) {
                   </h3>
                   <div className="flex flex-wrap mt-1">
                     <span className="border border-black text-black px-4 py-2 rounded-md text-sm mr-2 mb-2 font-bold">
-                      {listing.location.city}
+                      {listing?.city || 'Unknown City'}
                     </span>
                   </div>
                 </div>
@@ -559,55 +597,70 @@ export default function AdPage({ params }: { params: { title: string } }) {
                     
                     {/* Rate Rows */}
                     <div className="bg-white">
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">0.5 Hour</div>
-                        <div className="p-2">150 USD</div>
-                        <div className="p-2 flex items-center justify-center">
-                          <X className="h-4 w-4 text-red-500" />
+                      {/* Display actual incall and outcall rates from the ad data */}
+                      {listing?.incallRates && Object.keys(listing.incallRates).length > 0 ? (
+                        (() => {
+                          // Sort the rates to ensure 0.5 hour is at the top
+                          const sortedRates = Object.entries(listing.incallRates).sort((a, b) => {
+                            // Special case for 0.5 hour - always put it first
+                            if (a[0].includes('0.5') || a[0].includes('30 min')) return -1;
+                            if (b[0].includes('0.5') || b[0].includes('30 min')) return 1;
+                            
+                            // Extract numeric values for sorting
+                            const aNum = parseFloat(a[0]);
+                            const bNum = parseFloat(b[0]);
+                            return aNum - bNum;
+                          });
+                          
+                          return sortedRates.map(([duration, rate], index) => {
+                            const outcallRate = listing.outcallRates && listing.outcallRates[duration];
+                            
+                            // Format the duration to ensure it includes "hour" or "hours"
+                            let formattedDuration = duration;
+                            if (duration.includes('0.5') || duration.includes('30 min')) {
+                              formattedDuration = '0.5 hour';
+                            } else if (duration.toLowerCase().includes('overnight') || duration.toLowerCase().includes('night')) {
+                              formattedDuration = 'Overnight';
+                            } else if (!duration.toLowerCase().includes('hour')) {
+                              // Parse the duration to determine if it's 1 hour or multiple hours
+                              const durationNum = parseFloat(duration);
+                              if (durationNum === 1) {
+                                formattedDuration = `${duration} hour`;
+                              } else {
+                                formattedDuration = `${duration} hours`;
+                              }
+                            }
+                            
+                            // Format rates to include USD
+                            const formattedIncallRate = !rate.includes('USD') ? `${rate} USD` : rate;
+                            const formattedOutcallRate = outcallRate && !outcallRate.includes('USD') ? `${outcallRate} USD` : outcallRate;
+                            
+                            return (
+                              <div key={index} className="grid grid-cols-3 text-center border-b border-black">
+                                <div className="p-2 text-blue-600 font-medium">{formattedDuration}</div>
+                                <div className="p-2">
+                                  {formattedIncallRate && formattedIncallRate.trim() !== 'USD' ? formattedIncallRate : (
+                                    <div className="flex items-center justify-center">
+                                      <X className="h-4 w-4 text-red-500" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="p-2">
+                                  {formattedOutcallRate && formattedOutcallRate.trim() !== 'USD' ? formattedOutcallRate : (
+                                    <div className="flex items-center justify-center">
+                                      <X className="h-4 w-4 text-red-500" />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()
+                      ) : (
+                        <div className="p-4 text-center text-gray-500">
+                          No rate information available
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">1 Hour</div>
-                        <div className="p-2">200 USD</div>
-                        <div className="p-2">250 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">2 Hours</div>
-                        <div className="p-2">400 USD</div>
-                        <div className="p-2">500 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">3 Hours</div>
-                        <div className="p-2">600 USD</div>
-                        <div className="p-2">750 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">6 Hours</div>
-                        <div className="p-2">1200 USD</div>
-                        <div className="p-2">1500 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">12 Hours</div>
-                        <div className="p-2">2400 USD</div>
-                        <div className="p-2">3000 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center border-b border-black">
-                        <div className="p-2 text-blue-600 font-medium">24 Hours</div>
-                        <div className="p-2">5000 USD</div>
-                        <div className="p-2">6000 USD</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 text-center">
-                        <div className="p-2 text-blue-600 font-medium">48 Hours</div>
-                        <div className="p-2">10 USD</div>
-                        <div className="p-2">120 USD</div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -618,26 +671,56 @@ export default function AdPage({ params }: { params: { title: string } }) {
 
                   {/* Contact Buttons */}
                   <div className="space-y-3">
-                    <Link
-                      href={`tel:${contactInfo.phone}`}
-                      className="block w-full bg-primary text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-primary-light transition"
-                    >
-                      <PhoneIcon className="inline-block mr-2 h-4 w-4" /> {contactInfo.formattedPhone}
-                    </Link>
-                    <Link
-                      href={`https://wa.me/${contactInfo.whatsapp}`}
-                      className="block w-full bg-[#25D366] text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp
-                    </Link>
-                    <Link
-                      href={`mailto:${contactInfo.email}`}
-                      className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
-                    >
-                      <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
-                    </Link>
+                    {listing?.phone ? (
+                      <Link
+                        href={`tel:${listing.phone}`}
+                        className="block w-full bg-primary text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-primary-light transition"
+                      >
+                        <PhoneIcon className="inline-block mr-2 h-4 w-4" /> {listing.phone}
+                      </Link>
+                    ) : (
+                      <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                        <PhoneIcon className="inline-block mr-2 h-4 w-4" /> No phone provided
+                      </div>
+                    )}
+                    {listing?.whatsapp && listing?.phone ? (
+                      <Link
+                        href={`https://wa.me/${listing.phone}`}
+                        className="block w-full bg-[#25D366] text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp
+                      </Link>
+                    ) : (
+                      <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                        <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp not available
+                      </div>
+                    )}
+                    {listing?.email ? (
+                      <Link
+                        href={`mailto:${listing.email}`}
+                        className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
+                      >
+                        <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
+                      </Link>
+                    ) : (
+                      <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                        <EmailIcon className="inline-block mr-2 h-4 w-4" /> No email provided
+                      </div>
+                    )}
+                    {listing?.phone && (listing?.sms || listing?.smsEnabled) ? (
+                      <Link
+                        href={`sms:${listing.phone}`}
+                        className="block w-full bg-red-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-red-600 transition"
+                      >
+                        <MessageSquare className="inline-block mr-2 h-4 w-4" /> Send SMS
+                      </Link>
+                    ) : (
+                      <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                        <MessageSquare className="inline-block mr-2 h-4 w-4" /> SMS not available
+                      </div>
+                    )}
                   </div>
                   
                   {/* Report and Share Section - Mobile */}
@@ -683,26 +766,56 @@ export default function AdPage({ params }: { params: { title: string } }) {
 
                 {/* Contact Buttons */}
                 <div className="space-y-3">
-                  <Link
-                    href={`tel:${contactInfo.phone}`}
-                    className="block w-full bg-primary text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-primary-light transition"
-                  >
-                    <PhoneIcon className="inline-block mr-2 h-4 w-4" /> {contactInfo.formattedPhone}
-                  </Link>
-                  <Link
-                    href={`https://wa.me/${contactInfo.whatsapp}`}
-                    className="block w-full bg-[#25D366] text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp
-                  </Link>
-                  <Link
-                    href={`mailto:${contactInfo.email}`}
-                    className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
-                  >
-                    <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
-                  </Link>
+                  {listing?.phone ? (
+                    <Link
+                      href={`tel:${listing.phone}`}
+                      className="block w-full bg-primary text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-primary-light transition"
+                    >
+                      <PhoneIcon className="inline-block mr-2 h-4 w-4" /> {listing.phone}
+                    </Link>
+                  ) : (
+                    <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                      <PhoneIcon className="inline-block mr-2 h-4 w-4" /> No phone provided
+                    </div>
+                  )}
+                  {listing?.whatsapp ? (
+                    <Link
+                      href={`https://wa.me/${listing.phone}`}
+                      className="block w-full bg-[#25D366] text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-green-600 transition"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp
+                    </Link>
+                  ) : (
+                    <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                      <WhatsAppIcon className="inline-block mr-2 h-4 w-4" /> WhatsApp not available
+                    </div>
+                  )}
+                  {listing?.email ? (
+                    <Link
+                      href={`mailto:${listing.email}`}
+                      className="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:from-amber-600 hover:to-yellow-600 transition"
+                    >
+                      <EmailIcon className="inline-block mr-2 h-4 w-4" /> Send Email
+                    </Link>
+                  ) : (
+                    <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                      <EmailIcon className="inline-block mr-2 h-4 w-4" /> No email provided
+                    </div>
+                  )}
+                  {listing?.phone && (listing?.sms || listing?.smsEnabled) ? (
+                    <Link
+                      href={`sms:${listing.phone}`}
+                      className="block w-full bg-red-500 text-white text-center font-semibold py-3 px-4 rounded-md hover:bg-red-600 transition"
+                    >
+                      <MessageSquare className="inline-block mr-2 h-4 w-4" /> Send SMS
+                    </Link>
+                  ) : (
+                    <div className="block w-full bg-gray-200 text-gray-500 text-center font-semibold py-3 px-4 rounded-md">
+                      <MessageSquare className="inline-block mr-2 h-4 w-4" /> SMS not available
+                    </div>
+                  )}
                 </div>
                 
                 {/* Report and Share Section - Desktop */}
@@ -742,25 +855,15 @@ export default function AdPage({ params }: { params: { title: string } }) {
               <div className="bg-white p-5 rounded-xl shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Similar Ads</h2>
                 <div className="space-y-4">
-                  {sampleAds.slice(0, 3).map((ad) => (
-                    <Link href={`/ad/${ad.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}/?=${ad.id}`} key={ad.id} className="block">
-                      <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md transition">
-                        <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
-                          <Image
-                            src="/confident-professional.png"
-                            alt={ad.title}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-grow min-w-0">
-                          <h3 className="text-sm font-semibold text-gray-800 truncate">{ad.title}</h3>
-                          <p className="text-xs text-gray-500">{ad.location.city}, {ad.location.state}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                  {listing && listing.state ? (
+                    <div className="text-center py-2 text-gray-500 text-sm">
+                      Loading similar ads...
+                    </div>
+                  ) : (
+                    <div className="text-center py-2 text-gray-500 text-sm">
+                      No similar ads found
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -770,26 +873,64 @@ export default function AdPage({ params }: { params: { title: string } }) {
         {/* Mobile Fixed Contact Buttons */}
         {showMobileButtons && (
           <div className="fixed bottom-0 left-0 right-0 bg-white p-3 shadow-lg flex items-center justify-between z-40 md:hidden">
-            <Link
-              href={`tel:${contactInfo.phone}`}
-              className="flex-1 bg-primary text-white text-center font-semibold py-3 px-2 rounded-md mr-2"
-            >
-              <PhoneIcon className="inline-block mr-1 h-4 w-4" /> {contactInfo.formattedPhone}
-            </Link>
-            <Link
-              href={`https://wa.me/${contactInfo.whatsapp}`}
-              className="w-12 h-12 bg-[#25D366] text-white flex items-center justify-center rounded-md mr-2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <WhatsAppIcon className="h-5 w-5" />
-            </Link>
-            <Link
-              href={`mailto:${contactInfo.email}`}
-              className="w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center rounded-md"
-            >
-              <EmailIcon className="h-5 w-5" />
-            </Link>
+            {listing?.phone ? (
+              <Link
+                href={`tel:${listing.phone}`}
+                className="w-24 bg-primary text-white text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center"
+              >
+                <PhoneIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">Call</span>
+              </Link>
+            ) : (
+              <div className="w-24 bg-gray-200 text-gray-500 text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center">
+                <PhoneIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">No phone</span>
+              </div>
+            )}
+            {listing?.phone && (listing?.sms || listing?.smsEnabled) ? (
+              <Link
+                href={`sms:${listing.phone}`}
+                className="w-24 bg-red-500 text-white text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center"
+              >
+                <MessageSquare className="h-5 w-5 mb-1" />
+                <span className="text-xs">SMS</span>
+              </Link>
+            ) : (
+              <div className="w-24 bg-gray-200 text-gray-500 text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center">
+                <MessageSquare className="h-5 w-5 mb-1" />
+                <span className="text-xs">SMS</span>
+              </div>
+            )}
+            {listing?.whatsapp && listing?.phone ? (
+              <Link
+                href={`https://wa.me/${listing.phone}`}
+                className="w-24 bg-[#25D366] text-white text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <WhatsAppIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">WhatsApp</span>
+              </Link>
+            ) : (
+              <div className="w-24 bg-gray-200 text-gray-500 text-center font-semibold py-2 px-2 rounded-md mr-2 flex flex-col items-center justify-center">
+                <WhatsAppIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">WhatsApp</span>
+              </div>
+            )}
+            {listing?.email ? (
+              <Link
+                href={`mailto:${listing.email}`}
+                className="w-24 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-center font-semibold py-2 px-2 rounded-md flex flex-col items-center justify-center"
+              >
+                <EmailIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">Email</span>
+              </Link>
+            ) : (
+              <div className="w-24 bg-gray-200 text-gray-500 text-center font-semibold py-2 px-2 rounded-md flex flex-col items-center justify-center">
+                <EmailIcon className="h-5 w-5 mb-1" />
+                <span className="text-xs">Email</span>
+              </div>
+            )}
           </div>
         )}
         

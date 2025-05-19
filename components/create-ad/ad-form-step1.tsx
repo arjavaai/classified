@@ -119,7 +119,8 @@ export default function AdFormStep1() {
   }
 
   const handleCityChange = (value: string) => {
-    handleChange("city", value)
+    // Now we're directly receiving the city name as the value
+    handleChange("city", value);
   }
 
   const handleContactPreferenceChange = (value: "email" | "phone" | "both") => {
@@ -352,8 +353,8 @@ export default function AdFormStep1() {
                 <SelectValue placeholder="Select State" />
               </SelectTrigger>
               <SelectContent>
-                {statesList.map((stateItem) => (
-                  <SelectItem key={stateItem.abbreviation} value={stateItem.abbreviation}>
+                {statesList.map((stateItem, index) => (
+                  <SelectItem key={`${stateItem.abbreviation}-${index}`} value={stateItem.abbreviation}>
                     {stateItem.name}
                   </SelectItem>
                 ))}
@@ -375,8 +376,8 @@ export default function AdFormStep1() {
                 <SelectValue placeholder={state.state ? "Select City" : "Select State First"} />
               </SelectTrigger>
               <SelectContent>
-                {citiesList.map((city) => (
-                  <SelectItem key={city.slug} value={city.slug}>
+                {citiesList.map((city, index) => (
+                  <SelectItem key={`${city.slug}-${index}`} value={city.name}>
                     {city.name}
                   </SelectItem>
                 ))}

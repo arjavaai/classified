@@ -9,9 +9,8 @@ import SiteFooter from "@/components/site-footer"
 import ImageCarousel from "@/components/listing-card/ImageCarousel"
 import SearchForm from "@/components/search/search-form" 
 import SEOContent from "@/components/seo-content"
-import { getAdsByState } from "@/lib/ads-data"
+import { fetchAdsByState, Ad } from "@/lib/ad-utils"
 import { usaStatesAndCitiesData } from "@/lib/demo-data"
-import { Ad } from "@/lib/ads-data"
 import Pagination from "@/components/pagination"
 import { 
   getStateNameFromSlug, 
@@ -36,9 +35,6 @@ export default function StatePage({ params }: { params: { state: string } }) {
     if (name) {
       setStateName(name)
       
-      // Get state abbreviation for filtering ads
-      const stateAbbr = getStateAbbreviationFromSlug(params.state)
-      
       // Find state data to get cities
       const stateData = usaStatesAndCitiesData.states.find(
         state => state.name === name
@@ -47,12 +43,21 @@ export default function StatePage({ params }: { params: { state: string } }) {
       if (stateData) {
         setCities(stateData.cities)
         
-        // Get ads for this state
-        const stateAds = getAdsByState(stateAbbr)
-        setListings(stateAds)
+        // Fetch ads for this state from Firebase
+        const fetchAds = async () => {
+          try {
+            const stateAds = await fetchAdsByState(name)
+            console.log('Fetched ads for state:', name, stateAds)
+            setListings(stateAds)
+            
+            // Calculate total pages
+            setTotalPages(Math.ceil(stateAds.length / itemsPerPage))
+          } catch (error) {
+            console.error('Error fetching ads for state:', name, error)
+          }
+        }
         
-        // Calculate total pages
-        setTotalPages(Math.max(1, Math.ceil(stateAds.length / itemsPerPage)))
+        fetchAds()
       }
     }
   }, [params.state])
@@ -115,7 +120,7 @@ export default function StatePage({ params }: { params: { state: string } }) {
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {paginatedListings.map((listing, index) => (
               <div key={listing.id} className="relative w-[99%] mx-auto sm:w-full mb-1 mt-3">
-                {listing.isTop && (
+                {listing.adType === 'premium' && (
                   <div className="absolute -top-3 right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20">
                     <Crown className="w-3 h-3 mr-1" />
                     TOP
@@ -124,8 +129,8 @@ export default function StatePage({ params }: { params: { state: string } }) {
                 <Link href={getAdUrl(listing.title, listing.id)} className="block no-underline text-black">
                   <div className="bg-white rounded-xl border-2 border-accent-blue/50 shadow-sm overflow-hidden flex flex-row hover:shadow-md transition-shadow h-[253px] sm:h-[242px] md:h-[242px] relative">
                     <ImageCarousel 
-                      images={listing.images || [listing.image]} 
-                      photoCount={listing.photoCount}
+                      images={listing.photos || []} 
+                      photoCount={listing.photos?.length || 0}
                     />
                     <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
                       <div>
@@ -140,14 +145,42 @@ export default function StatePage({ params }: { params: { state: string } }) {
                         {listing.nationality && (
                           <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
                             <Globe className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                            <span>{listing.nationality}</span>
+                            <span>{typeof listing.nationality === 'string' ? 
+                              listing.nationality.split(/(?=[A-Z])/)[0] : 
+                              Array.isArray(listing.nationality) ? 
+                                listing.nationality[0] : 
+                                listing.nationality}</span>
                           </div>
                         )}
                         <div className="flex items-center text-xs sm:text-sm text-gray-600">
                           <MapPin className="mr-1 sm:mr-2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
-                          <span>{listing.location.city}, {listing.location.area}</span>
+                          <span>{listing.city}</span>
                         </div>
-                        <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">${listing.price}</div>
+                        <div className="text-green-600 font-semibold text-base sm:text-lg mt-1 sm:mt-3">
+                          {(() => {
+                            // Get all rates from both incall and outcall
+                            const allRates: number[] = [];
+                            
+                            // Add incall rates if available
+                            if (listing.incallRates && Object.keys(listing.incallRates).length > 0) {
+                              Object.values(listing.incallRates).forEach(rate => {
+                                const numRate = parseInt(rate.toString().replace(/[^0-9]/g, ''));
+                                if (!isNaN(numRate)) allRates.push(numRate);
+                              });
+                            }
+                            
+                            // Add outcall rates if available
+                            if (listing.outcallRates && Object.keys(listing.outcallRates).length > 0) {
+                              Object.values(listing.outcallRates).forEach(rate => {
+                                const numRate = parseInt(rate.toString().replace(/[^0-9]/g, ''));
+                                if (!isNaN(numRate)) allRates.push(numRate);
+                              });
+                            }
+                            
+                            // Return the minimum rate if available
+                            return allRates.length > 0 ? `$${Math.min(...allRates)}` : '';
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>

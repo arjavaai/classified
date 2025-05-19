@@ -271,20 +271,16 @@ export const createAd = async (adData: any) => {
   }
   
   try {
-    // Generate a unique ad ID
-    const uniqueAdId = await generateUniqueAdId();
-    
     const adsCollectionRef = collection(db, "ads");
     const docRef = await addDoc(adsCollectionRef, {
       ...adData,
-      adId: uniqueAdId, // Add the unique ad ID
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       status: adData.adType === 'premium' ? "active" : "pending"
     });
     
-    console.log("Ad created with ID:", docRef.id, "and unique ad ID:", uniqueAdId);
-    return { success: true, adId: docRef.id, uniqueAdId };
+    console.log("Ad created with Firebase document ID:", docRef.id);
+    return { success: true, adId: docRef.id, uniqueAdId: docRef.id };
   } catch (error: any) {
     console.error("Error creating ad:", error);
     return { success: false, error: error.message };

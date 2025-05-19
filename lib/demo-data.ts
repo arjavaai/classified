@@ -50,15 +50,6 @@ export const usaStatesAndCitiesData = {
       ]
     },
     {
-      "name": "Alaska",
-      "abbreviation": "AK",
-      "cities": [
-        { "name": "Anchorage", "slug": "anchorage" },
-        { "name": "Fairbanks", "slug": "fairbanks" },
-        { "name": "Juneau", "slug": "juneau" }
-      ]
-    },
-    {
       "name": "Arizona",
       "abbreviation": "AZ",
       "cities": [

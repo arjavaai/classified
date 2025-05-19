@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['undici', 'firebase'],
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
+  },
   webpack: (config, { isServer }) => {
     // Add a rule to handle private class fields in node_modules
     config.module.rules.push({
