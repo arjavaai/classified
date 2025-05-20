@@ -5,7 +5,7 @@ import { getStateNameFromSlug, getCityNameFromSlug } from '@/lib/route-utils'
 import CityClient from './city-client'
 
 // This is a Server Component that pre-fetches data
-export default async function CityPage({ params }: { params: { state: string; city: string } }) {
+export default async function CityPageSSR({ params }: { params: { state: string; city: string } }) {
   try {
     // Pre-fetch the content from Firestore using Admin SDK
     const pageContent = await getCityPageContentSSR(params.state, params.city)
@@ -30,7 +30,7 @@ export default async function CityPage({ params }: { params: { state: string; ci
       </Suspense>
     )
   } catch (error) {
-    console.error('Error in CityPage:', error)
+    console.error('Error in CityPageSSR:', error)
     // Fallback to client-side rendering if server-side fails
     return (
       <Suspense fallback={<div>Loading...</div>}>

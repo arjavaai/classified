@@ -1,24 +1,18 @@
 import { Suspense } from 'react'
 import { getStatePageContentSSR } from '@/lib/location-content-admin'
-import { fetchAdsByStateSSR, listAllAdsSSR } from '@/lib/ad-utils-admin'
+import { fetchAdsByStateSSR } from '@/lib/ad-utils-admin'
 import { getStateNameFromSlug } from '@/lib/route-utils'
 import { usaStatesAndCitiesData } from '@/lib/demo-data'
 import StateClient from './state-client'
 
 // This is a Server Component that pre-fetches data
-export default async function StatePage({ params }: { params: { state: string } }) {
+export default async function StatePageSSR({ params }: { params: { state: string } }) {
   try {
-    // Debug: List all ads in the database
-    console.log('[DEBUG] Listing all ads in the database');
-    const allAds = await listAllAdsSSR();
-    console.log(`[DEBUG] Found ${allAds.length} total ads in the database`);
-    
     // Pre-fetch the content from Firestore using Admin SDK
     const pageContent = await getStatePageContentSSR(params.state)
     
     // Get state name from slug
     const stateName = getStateNameFromSlug(params.state)
-    console.log(`[DEBUG] State name from slug: '${stateName}' (slug: '${params.state}')`)
     
     // Get cities for this state
     let cities: { name: string; slug: string }[] = []
@@ -32,12 +26,10 @@ export default async function StatePage({ params }: { params: { state: string } 
           name: city.name,
           slug: city.slug
         }))
-        console.log(`[DEBUG] Found ${cities.length} cities for state: ${stateName}`)
       }
     }
     
     // Pre-fetch ads for this state using Admin SDK
-    console.log(`[DEBUG] Fetching ads for state: ${stateName}`);
     const stateAds = await fetchAdsByStateSSR(params.state)
     
     // Render the client component with pre-fetched data
@@ -53,7 +45,7 @@ export default async function StatePage({ params }: { params: { state: string } 
       </Suspense>
     )
   } catch (error) {
-    console.error('Error in StatePage:', error)
+    console.error('Error in StatePageSSR:', error)
     // Fallback to client-side rendering if server-side fails
     return (
       <Suspense fallback={<div>Loading...</div>}>
