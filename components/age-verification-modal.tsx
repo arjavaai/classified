@@ -104,7 +104,7 @@ export default function AgeVerificationModal() {
           <div className="text-center mb-6 text-gray-700">
             <p className="mb-4">By continuing, I confirm that I am at least 18 years old and consent to viewing adult content including explicit texts and images.</p>
             
-            <p>I have read and agree to the <Link href="/terms" className="text-primary font-semibold">Terms and Conditions</Link> of this website.</p>
+            <p>I have read and agree to the <span className="text-primary font-semibold">Terms and Conditions</span> of this website.</p>
           </div>
 
           <div className="w-full space-y-3">

@@ -5,66 +5,70 @@ import { getStateNameFromSlug } from '@/lib/route-utils'
 import { usaStatesAndCitiesData } from '@/lib/demo-data'
 import StateClient from './state-client'
 
+// Helper function to get cities for a state name
+function getCitiesForState(stateName: string): { name: string; slug: string }[] {
+  if (!stateName) return [];
+  
+  const stateData = usaStatesAndCitiesData.states.find(s => s.name === stateName);
+  if (!stateData) return [];
+  
+  return stateData.cities.map(city => ({
+    name: city.name,
+    slug: city.slug
+  }));
+}
+
 // This is a Server Component that pre-fetches data
 export default async function StatePage({ params }: { params: { state: string } }) {
+  // Extract the state parameter
+  const stateParam = params.state;
+  
   try {
     // Debug: List all ads in the database
-    console.log('[DEBUG] Listing all ads in the database');
     const allAds = await listAllAdsSSR();
     console.log(`[DEBUG] Found ${allAds.length} total ads in the database`);
     
     // Pre-fetch the content from Firestore using Admin SDK
-    const pageContent = await getStatePageContentSSR(params.state)
+    const pageContent = await getStatePageContentSSR(stateParam);
     
     // Get state name from slug
-    const stateName = getStateNameFromSlug(params.state)
-    console.log(`[DEBUG] State name from slug: '${stateName}' (slug: '${params.state}')`)
+    const stateName = getStateNameFromSlug(stateParam);
+    console.log(`[DEBUG] State name from slug: '${stateName}' (slug: '${stateParam}')`);
     
     // Get cities for this state
-    let cities: { name: string; slug: string }[] = []
-    if (stateName) {
-      const stateData = usaStatesAndCitiesData.states.find(
-        state => state.name === stateName
-      )
-      
-      if (stateData) {
-        cities = stateData.cities.map(city => ({
-          name: city.name,
-          slug: city.slug
-        }))
-        console.log(`[DEBUG] Found ${cities.length} cities for state: ${stateName}`)
-      }
-    }
+    const cities = getCitiesForState(stateName);
+    console.log(`[DEBUG] Found ${cities.length} cities for state: ${stateName}`);
     
     // Pre-fetch ads for this state using Admin SDK
     console.log(`[DEBUG] Fetching ads for state: ${stateName}`);
-    const stateAds = await fetchAdsByStateSSR(params.state)
+    const stateAds = await fetchAdsByStateSSR(stateParam);
     
     // Render the client component with pre-fetched data
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <StateClient 
-          params={params} 
+          params={{ state: stateParam }} 
           initialPageContent={pageContent}
           initialStateName={stateName || ''}
           initialCities={cities}
           initialListings={stateAds}
         />
       </Suspense>
-    )
+    );
   } catch (error) {
-    console.error('Error in StatePage:', error)
+    console.error('Error in StatePage:', error);
+    
     // Fallback to client-side rendering if server-side fails
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <StateClient 
-          params={params} 
+          params={{ state: stateParam }} 
           initialPageContent={null}
-          initialStateName={getStateNameFromSlug(params.state) || ''}
+          initialStateName={getStateNameFromSlug(stateParam) || ''}
           initialCities={[]}
           initialListings={[]}
         />
       </Suspense>
-    )
+    );
   }
 }

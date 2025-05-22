@@ -263,7 +263,7 @@ function ListingHeader() {
                       Home
                     </Link>
                     <Link
-                      href="/us/escorts"
+                      href="/"
                       className="flex items-center p-3 bg-gray-100 rounded-md hover:bg-gray-200"
                       onClick={toggleMenu}
                     >

@@ -137,13 +137,13 @@ export default function CookieConsentBanner() {
             
             <div className="text-xs text-gray-600 mt-2">
               For more information, please visit our{" "}
-              <Link href="/cookie-policy" className="text-primary font-semibold">
+              <span className="text-primary font-semibold">
                 Cookie Notice
-              </Link>
+              </span>
               {" "}and our{" "}
-              <Link href="/privacy-policy" className="text-primary font-semibold">
+              <span className="text-primary font-semibold">
                 Privacy Notice
-              </Link>
+              </span>
             </div>
           </div>
         ) : (

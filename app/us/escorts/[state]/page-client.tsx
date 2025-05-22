@@ -75,7 +75,7 @@ export default function StatePageClient({
       <div className="max-w-5xl mx-auto pt-8 px-1 sm:px-4">
         {/* Breadcrumbs */}
         <div className="text-sm mb-4 px-2 sm:px-0">
-          <Link href="/us/escorts" className="text-blue-600 hover:underline">
+          <Link href="/" className="text-blue-600 hover:underline">
             Home
           </Link>
           <span className="mx-2">›</span>

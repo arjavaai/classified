@@ -37,23 +37,24 @@ if (isBrowser) {
   });
 }
 
-if (!hasValidConfig && isBrowser) {
-  console.error("Firebase configuration is missing required values. Check your .env.local file.");
-  // Fall back to hardcoded values for development only
-  if (process.env.NODE_ENV === 'development') {
-    console.log("Falling back to hardcoded values in development mode");
-    // Update with the correct fallback values matching the current project
-    firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyBkhEAy18wAhpxkUJwv0XoGTfUbOdq_y3Y";
-    firebaseConfig.authDomain = firebaseConfig.authDomain || "skluva.firebaseapp.com";
-    firebaseConfig.projectId = firebaseConfig.projectId || "skluva";
-    firebaseConfig.storageBucket = firebaseConfig.storageBucket || "skluva.firebasestorage.app";
-    firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "567077871212";
-    firebaseConfig.appId = firebaseConfig.appId || "1:567077871212:web:65517af125e7ce809f8249";
-    console.log("Using fallback values:", { 
-      ...firebaseConfig, 
-      apiKey: "HIDDEN" 
-    });
+// Always provide fallback values in development mode to prevent crashes
+if ((!hasValidConfig && isBrowser) || process.env.NODE_ENV === 'development') {
+  if (!hasValidConfig) {
+    console.warn("Some Firebase configuration values are missing. Using fallback values in development mode.");
   }
+  
+  // Use existing values or fallback to hardcoded values
+  firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyBkhEAy18wAhpxkUJwv0XoGTfUbOdq_y3Y";
+  firebaseConfig.authDomain = firebaseConfig.authDomain || "skluva.firebaseapp.com";
+  firebaseConfig.projectId = firebaseConfig.projectId || "skluva";
+  firebaseConfig.storageBucket = firebaseConfig.storageBucket || "skluva.firebasestorage.app";
+  firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "567077871212";
+  firebaseConfig.appId = firebaseConfig.appId || "1:567077871212:web:65517af125e7ce809f8249";
+  
+  console.log("Using fallback values:", { 
+    ...firebaseConfig, 
+    apiKey: "HIDDEN" 
+  });
 }
 
 let app: FirebaseApp | undefined;
