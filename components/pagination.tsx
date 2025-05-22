@@ -51,8 +51,11 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
   
   // Helper to generate page URL
   const getPageUrl = (page: number) => {
-    if (page === 1) return baseUrl
-    return `${baseUrl}?page=${page}`
+    // Get the current path without any query parameters
+    const currentPath = baseUrl.split('?')[0];
+    
+    if (page === 1) return currentPath
+    return `${currentPath}?page=${page}`
   }
 
   return (

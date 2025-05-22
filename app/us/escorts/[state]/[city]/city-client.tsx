@@ -26,6 +26,11 @@ interface CityClientProps {
   initialListings: Ad[]
 }
 
+// Helper function to create a slug from name
+function createSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
+
 export default function CityClient({ 
   params, 
   initialPageContent,
@@ -44,13 +49,14 @@ export default function CityClient({
   }, [initialStateName, initialCityName, initialListings, initialPageContent]);
 
   // Use the pre-fetched data as initial state
-  const [listings, setListings] = useState<Ad[]>(initialListings)
+  const [allListings, setAllListings] = useState<Ad[]>(initialListings)
   const [stateName] = useState(initialStateName)
   const [cityName] = useState(initialCityName)
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(Math.ceil(initialListings.length / 10))
+  const [totalPages, setTotalPages] = useState(Math.ceil(initialListings.length / 30))
   const [pageContent] = useState<LocationPageContent | null>(initialPageContent)
-  const itemsPerPage = 10
+  const [isLoading, setIsLoading] = useState(false)
+  const itemsPerPage = 30
   
   useEffect(() => {
     // Update document title and meta description
@@ -63,23 +69,47 @@ export default function CityClient({
     }
   }, [pageContent])
   
-  // Get current page from URL on client-side
+  // Get current page from URL on client-side and update when URL changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
-      const page = parseInt(urlParams.get('page') || '1')
-      setCurrentPage(isNaN(page) || page < 1 ? 1 : page)
+    const updatePageFromUrl = () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const page = parseInt(urlParams.get('page') || '1')
+        setCurrentPage(isNaN(page) || page < 1 ? 1 : page)
+      }
+    }
+    
+    // Initial page load
+    updatePageFromUrl()
+    
+    // Listen for URL changes (back/forward navigation)
+    window.addEventListener('popstate', updatePageFromUrl)
+    window.addEventListener('pushstate', updatePageFromUrl)
+    
+    return () => {
+      window.removeEventListener('popstate', updatePageFromUrl)
+      window.removeEventListener('pushstate', updatePageFromUrl)
     }
   }, [])
+  
+  // Update total pages when all listings change
+  useEffect(() => {
+    setTotalPages(Math.ceil(allListings.length / itemsPerPage))
+  }, [allListings, itemsPerPage])
   
   // Get paginated listings
   const getPaginatedListings = () => {
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = startIndex + itemsPerPage
-    return listings.slice(startIndex, endIndex)
+    return allListings.slice(startIndex, endIndex)
   }
   
   const paginatedListings = getPaginatedListings()
+  
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage])
   
   return (
     <div className="bg-white">
@@ -125,7 +155,7 @@ export default function CityClient({
         </h1>
 
         {/* Listings */}
-        {listings.length > 0 ? (
+        {allListings.length > 0 ? (
           <div className="flex flex-col gap-4 mb-8 overflow-hidden">
             {paginatedListings.map((listing) => (
               <div key={listing.id} className="relative w-[99%] mx-auto sm:w-full mb-1 mt-3">
@@ -207,11 +237,11 @@ export default function CityClient({
         )}
         
         {/* Pagination */}
-        {listings.length > itemsPerPage && (
+        {allListings.length > itemsPerPage && (
           <Pagination 
             currentPage={currentPage} 
             totalPages={totalPages} 
-            baseUrl={`/us/escorts/${params.state}/${params.city}`}
+            baseUrl={`/us/escorts/${params.state && params.state !== 'undefined' ? params.state : createSlug(stateName)}/${params.city && params.city !== 'undefined' ? params.city : createSlug(cityName)}`}
           />
         )}
       </div>

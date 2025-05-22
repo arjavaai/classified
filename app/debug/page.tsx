@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/context/auth-context";
 import { createSampleAdsForUser, checkFirestoreConnection } from "@/lib/debug-utils";
 import { fetchUserAds, deleteAd } from "@/lib/ad-utils";
+import { getStates, getCitiesByStateCode } from "@/lib/demo-data";
 import Link from "next/link";
 import { Trash, Loader2, RefreshCw } from "lucide-react";
 
@@ -17,6 +18,35 @@ export default function DebugPage() {
   const [firestoreStatus, setFirestoreStatus] = useState<string | null>(null);
   const [userAds, setUserAds] = useState<any[]>([]);
   const [deletingAdIds, setDeletingAdIds] = useState<string[]>([]);
+  const [selectedStateCode, setSelectedStateCode] = useState("");
+  const [selectedCitySlug, setSelectedCitySlug] = useState("");
+  const [selectedStateName, setSelectedStateName] = useState("");
+  const [selectedCityName, setSelectedCityName] = useState("");
+  const [statesList, setStatesList] = useState<{name: string; abbreviation: string}[]>([]);
+  const [citiesList, setCitiesList] = useState<{name: string; slug: string}[]>([]);
+
+  // Load states when component mounts
+  useEffect(() => {
+    setStatesList(getStates());
+  }, []);
+
+  // Load cities when state changes
+  useEffect(() => {
+    if (selectedStateCode) {
+      setCitiesList(getCitiesByStateCode(selectedStateCode));
+      setSelectedCitySlug(""); // Reset city when state changes
+      setSelectedCityName("");
+      
+      // Find the state name from the code
+      const state = statesList.find(s => s.abbreviation === selectedStateCode);
+      if (state) {
+        setSelectedStateName(state.name);
+      }
+    } else {
+      setCitiesList([]);
+      setSelectedStateName("");
+    }
+  }, [selectedStateCode, statesList]);
 
   const handleCreateSampleAds = async () => {
     if (!user) {
@@ -29,7 +59,7 @@ export default function DebugPage() {
     setError(null);
     
     try {
-      const adIds = await createSampleAdsForUser(user.uid, adCount);
+      const adIds = await createSampleAdsForUser(user.uid, adCount, selectedStateName, selectedCityName);
       setCreatedAdIds(adIds);
       setMessage(`Successfully created ${adIds.length} sample ads for user ${user.uid}`);
       
@@ -197,6 +227,50 @@ export default function DebugPage() {
                 onChange={(e) => setAdCount(parseInt(e.target.value))} 
                 className="border border-gray-300 rounded-md px-3 py-2 w-20"
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block font-medium mb-1">State:</label>
+                <select
+                  className="border border-gray-300 rounded-md px-3 py-2 w-full"
+                  value={selectedStateCode}
+                  onChange={(e) => setSelectedStateCode(e.target.value)}
+                >
+                  <option value="">Select a state</option>
+                  {statesList.map((state) => (
+                    <option key={state.abbreviation} value={state.abbreviation}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-medium mb-1">City:</label>
+                <select
+                  className="border border-gray-300 rounded-md px-3 py-2 w-full"
+                  value={selectedCitySlug}
+                  onChange={(e) => {
+                    setSelectedCitySlug(e.target.value);
+                    // Find the city name from the slug
+                    const city = citiesList.find(c => c.slug === e.target.value);
+                    if (city) {
+                      setSelectedCityName(city.name);
+                    } else {
+                      setSelectedCityName("");
+                    }
+                  }}
+                  disabled={!selectedStateCode}
+                >
+                  <option value="">Select a city</option>
+                  {citiesList.map((city) => (
+                    <option key={city.slug} value={city.slug}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             
             <button 

@@ -7,15 +7,18 @@ import { deleteAd } from './ad-utils';
  * Creates sample ads for a user to help with debugging
  * @param userId The user ID to create ads for
  * @param count Number of sample ads to create
+ * @param stateName Optional state name to use for the ads
+ * @param cityName Optional city name to use for the ads
  * @returns A promise that resolves to an array of created ad IDs
  */
-export const createSampleAdsForUser = async (userId: string, count: number = 3): Promise<string[]> => {
+export const createSampleAdsForUser = async (userId: string, count: number = 3, stateName?: string, cityName?: string): Promise<string[]> => {
   if (!db) {
     console.error("Firestore not initialized");
     return [];
   }
 
   const adIds: string[] = [];
+  // Default states and cities if none are specified
   const states = ["California", "New York", "Florida", "Texas", "Illinois"];
   const cities = ["Los Angeles", "New York", "Miami", "Houston", "Chicago"];
   const titles = [
@@ -48,6 +51,10 @@ export const createSampleAdsForUser = async (userId: string, count: number = 3):
       const ageIndex = Math.floor(Math.random() * ages.length);
       const adTypeIndex = Math.floor(Math.random() * adTypes.length);
       
+      // Use provided state and city if available
+      let state = states[stateIndex];
+      let city = cities[stateIndex].toLowerCase().replace(/ /g, '-');
+      
       // Create a unique ad ID
       const uniqueAdId = await generateUniqueAdId();
       
@@ -60,7 +67,7 @@ export const createSampleAdsForUser = async (userId: string, count: number = 3):
         // Basic info
         userId: userId, // This is critical for querying
         adType: adTypes[adTypeIndex],
-        status: adTypes[adTypeIndex] === 'premium' ? 'active' : 'pending',
+        status: 'active', // All debug ads are set to active
         
         // Personal info
         name: `Sample ${i+1}`,
@@ -73,8 +80,8 @@ export const createSampleAdsForUser = async (userId: string, count: number = 3):
         sms: true,
         
         // Location
-        state: states[stateIndex],
-        city: cities[stateIndex].toLowerCase().replace(/ /g, '-'), // Match city to state with proper slug format
+        state: stateName ? stateName : states[stateIndex],
+        city: cityName ? cityName : cities[stateIndex], // Use selected city name or random one
         
         // Ad details
         title: `${titles[titleIndex]} ${i+1}`,
